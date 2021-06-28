@@ -1,15 +1,21 @@
 Package: QCtreeCNV
-Title: What the Package Does (One Line, Title Case)
+Title: Reducing the visual inspection effort in CNV calling
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Simone",
+           family = "Montalbano",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "simone.montalbano@pm.me",
+           comment = c(ORCID = "0000-0002-9846-0560"))
+Description: This package implement a QC filtering pipeline
+  for CNV data in recurrent fixed loci in the human genome.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    data.table
