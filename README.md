@@ -17,4 +17,4 @@ The filtering pipeline is implemented as a decision making tree, a series of
 consecutive steps that separate good putative candidates form bad ones.
 This scheme gives a good first peek at this process.
 
-![The QC filtering tree](./misc/QC_tree.png")
+![The QC filtering tree](./misc/QC_tree.png)
