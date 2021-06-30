@@ -1,0 +1,71 @@
+---
+title: "Fixed loci CNV calling filtering tree"
+author: "Simone Montalbano"
+date: "`r lubridate::date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{QC_tree}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+The aim of this package is to [...]
+
+# Setup
+
+To install and load the latest version of the package you can
+run the following code:
+
+```{r setup}
+devtools::install_github("SinomeM/QCtreeCNV")
+library(QCtreeCNV)
+```
+
+# Data Format
+
+The pipeline require two main input objects:
+
+1. a `data.frame` (bonus if already `data.table`)
+   containing the putative CNV carriers calls;   
+1. a `data.frame` (bonus if already `data.table`)
+   containing the required quality metrics.
+
+Additionally the package will compute CNVRs (starting from
+table 1).
+
+We provide functions to create the quality metrics table
+starting from:
+
+a. the raw intensity files;   
+b. genomic coordinates of the loci of interest;   
+c. a table to link samples ID to the raw intensity files.
+
+Specifications on each object is given in the following sections.
+
+## CNV calls
+
+Table 1 consist of the [...]
+
+## Quality metrics / Raw data trends
+
+Table 2 consist of [...]
+
+
+# Run the Pipeline
+
+
+# Session
+
+```{r}
+sessionInfo()
+```
+
