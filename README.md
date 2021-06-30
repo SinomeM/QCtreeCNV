@@ -9,7 +9,7 @@ the focus is on calling recurrent CNVs in fixed loci in particular.
 The aim is to integrate a much more powerful filter in the pipeline,
 before visual inspection, as exemplified in this figure.
 
-![Recurrent CNV calling pipeline](./vignettes/CNVpipeline.png.png)
+![Recurrent CNV calling pipeline](./vignettes/CNVpipeline.png)
 
 ## The filtering pipeline
 
