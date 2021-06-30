@@ -20,9 +20,16 @@ knitr::opts_chunk$set(
 # Introduction
 
 The aim of this package is to [...]
-PennCNV calls, or any other software, given the availability
+
+The focus is PennCNV calls, or any other software, given the availability
 of the three following global qality scores: BAF drift, LRR SD,
 GC Waviness Factor.
+
+This is a graphical representation of a CNV calling pipeline in fixed
+genomic loci. The packege implement a filtering step just before visual
+inspection.
+
+![CNV calling pipeline](./CNVpipeline.png){width=100%}
 
 
 # Setup

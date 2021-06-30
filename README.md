@@ -9,7 +9,7 @@ the focus is on calling recurrent CNVs in fixed loci in particular.
 The aim is to integrate a much more powerful filter in the pipeline,
 before visual inspection, as exemplified in this figure.
 
-![Recurrent CNV calling pipeline](./vignettes/CNVpipeline.png)
+![CNVpipeline](./vignettes/CNVpipeline.png)
 
 ## The filtering pipeline
 
@@ -17,7 +17,7 @@ The filtering pipeline is implemented as a decision making tree, a series of
 consecutive steps that separate good putative candidates form bad ones.
 This scheme gives a good first peek at this process.
 
-![The QC filtering tree](./vignettes/QCtree.png)
+![QCtree](./vignettes/QCtree.png){width=85%}
 
 ## Details
 
