@@ -16,19 +16,25 @@ knitr::opts_chunk$set(
 )
 ```
 
+
 # Introduction
 
 The aim of this package is to [...]
+PennCNV calls, or any other software, given the availability
+of the three following global qality scores: BAF drift, LRR SD,
+GC Waviness Factor.
+
 
 # Setup
 
 To install and load the latest version of the package you can
 run the following code:
 
-```{r setup}
+```{r setup, eval=F}
 devtools::install_github("SinomeM/QCtreeCNV")
 library(QCtreeCNV)
 ```
+
 
 # Data Format
 
@@ -37,7 +43,10 @@ The pipeline require two main input objects:
 1. a `data.frame` (bonus if already `data.table`)
    containing the putative CNV carriers calls;   
 1. a `data.frame` (bonus if already `data.table`)
-   containing the required quality metrics.
+   containing the required quality metrics, it can be
+   created using provided functions;   
+2. a `data.table` containing CNVRs info, this is computed
+   by a package function.
 
 Additionally the package will compute CNVRs (starting from
 table 1).
@@ -50,17 +59,84 @@ b. genomic coordinates of the loci of interest;
 c. a table to link samples ID to the raw intensity files.
 
 Specifications on each object is given in the following sections.
+We tried to keep some sort of consistency with PennCNV format when
+possible.
 
 ## CNV calls
 
 Table 1 consist of the [...]
 
+### Format
+
+| Column Name | Format | Notes |
+| :---------- | :----: | :---- |
+| sample_ID   | <chr>  | _     |
+| locus       | <chr>  | e.g. 22q11.2 |
+| chr         | <chr>  | e.g. chr1 |
+| start       | <int>  | _     |
+| stop        | <int>  | _     |
+| type        | <chr>  | "deletion"/"duplication" |
+| CNVR_ID     | <chr>  | this columns is added by the package |
+
+Details [...]
+
 ## Quality metrics / Raw data trends
 
 Table 2 consist of [...]
 
+### Format
+
+| Column Name  | Format  | Notes |
+| :----------  | :----:  | :---- |
+| sample_ID    | <chr>   | _     |
+| locus        | <chr>   | _     |
+| put_carrier  | <logi>  | is the sample a putative carrier for this locus?\* |
+| logr1        | <num>   | _     |
+| LRRSDlocus   | <num>   | _     |
+| BAFc         | <num>   | _     |
+| BAFb         | <num>   | _     |
+| centDistProp | <num>   | _     |
+| overlapProp  | <num>   | _     |
+| BAFdrift     | <num>   | _     |
+| LRRSD        | <num>   | _     |
+| GCWF         | <num>   | _     |
+
+\*: Currently if the table is created using the provided functions
+one line is created for each sample/locus combination, even if the
+sample is a putative carrier only for one specific locus. Note
+however that this is not mandatory, it is for done mostly to reuse
+computation time in downstream efficacy measures.
+
+Details [...]
+
+## CNVRs
+
+Table 3 consist of [...]
+
+### Format
+
+| Column name | Format | Notes |
+|-------------|--------|-------|
+| CNVR_ID     | <chr>  | _     |
+| chr         | <chr>  | e.g. chr1 |
+| start       | <int>  | _     |
+| stop        | <int>  | _     |
+| freq        | <int>  | _     |
+
 
 # Run the Pipeline
+
+The package has two main functions:
+
+1. `computeCNVRs()` clusterize CNVs into CNV Regions;   
+1. `qctree()` runs the filtering pipeline;
+
+In principle one could also use a different method to create
+CNVRs, as long as the output format is compatible to the `QCtreeCNV`
+one.
+
+We provide two additional functions to easily create the
+quality metrics table, however it can be computed 
 
 
 # Session
