@@ -37,7 +37,7 @@ This is a graphical representation of a CNV calling pipeline in fixed
 genomic loci. The package implement a filtering step just before visual
 inspection.
 
-![CNV calling pipeline](./CNVpipeline.png){width=100%}
+![Fig 1, CNV calling pipeline](./CNVpipeline.png){width=100%}
 
 
 # Setup
@@ -217,14 +217,23 @@ The two following images give a graphical representation of the package
 standard pipeline (with the specific function used in each step) and of
 the decision making tree implemented with `qctree()`.
 
-![QCtreeCNVpipeline](./QCtreeCNV_pipeline.png){width=100%}
+![Fig 2, QCtreeCNV package full pipeline](./QCtreeCNV_pipeline.png){width=100%}
 
-![Decision making filtering tree](./QCtree.png){width=80%}
+![Fig 3, Decision making filtering tree](./QCtree.png){width=80%}
 
 ## Details
 
-Some details on each step, the numbering follows the one in the
-previous figure:
+Some details on each step, the numbering follows the one in the figure.
+
+Fig 2:
+
+1. df
+2. dsf
+3. sfd
+4. sdf
+5. df
+
+Fig 3:
 
 1. df
 2. dsf
@@ -232,7 +241,6 @@ previous figure:
 4. sdf
 5. df
 6. dfd
-
 
 # Session
 
