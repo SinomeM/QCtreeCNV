@@ -27,8 +27,10 @@
 # @examples
 # DT <- cnvrs_create(penn_22, hg19_chr_arms)
 
-# OK for now, it would be nice to add a third step where for all CNVs in a CNVRs
-# it check the adjacent CNVRs if there is a better overlap, not super easy
+## TODO!
+# 1. UPDATE DATA FORMAT (e.g. end -> stop)!!!
+# 1. add last step, merge 75% overlap CNVRs + update CNVRs + update CNVs
+# 2. update documentation here
 
 cnvrs_create <- function(cnvs, chr_arms, prop = 0.3) {
   # check input
@@ -384,105 +386,3 @@ remove_cnvs <- function(DT, prop) {
   return(DT)
 }
 
-# Collection of internal functions used by more than one functions in the package
-
-get_region <- function(my_line, prop = 1) {
-  # given a line consisting of a single CNV, returns a vector constaing chr,
-  # start, end , length * prop as integers
-  chr <- as.integer(my_line$chr)
-  st <- as.integer(my_line$start)
-  en <- as.integer(my_line$end)
-  len <- (en - st +1) * prop
-  reg <- c(chr, st, en, len)
-
-  return(reg)
-}
-
-get_region_with_rID <- function(my_line, prop = 1) {
-  # same as get_region but returns also r_ID if present, in that case reg is a
-  # list of vectors, in this way reg[[1]] remain a numeric vector
-  chr <- as.integer(my_line$chr)
-  st <- as.integer(my_line$start)
-  en <- as.integer(my_line$end)
-  len <- (en - st +1) * prop
-  reg <- c(chr, st, en, len)
-
-  # attach also r_ID if present
-  if ("r_ID" %in% colnames(my_line))
-    reg <- list(reg, my_line$r_ID)
-
-  return(reg)
-}
-
-get_regions_list <- function(my_lines, prop = 1) {
-  # same as get_region but with multiple lines, returns a list of vectors
-  chr <- as.integer(my_lines$chr)
-  st <- as.integer(my_lines$start)
-  en <- as.integer(my_lines$end)
-  len <- (en - st +1) * prop
-
-  # list of list when R_ID or cnvrs information are present (character/numeric)
-  if ("r_ID" %in% colnames(my_lines))
-    reg <- list(chr, st, en, len, my_lines$r_ID)
-  else if ("cnvr" %in% colnames(my_lines))
-      reg <- list(chr, st, en, len, my_lines$cnvr)
-  else
-    reg <- list(chr, st, en, len)
-
-  return(reg)
-}
-
-
-check_overlap <- function(cnvs, my_reg, prop) {
-  # search reciprocal overlap between "my_reg" and any entry in "cnvs", if found
-  # returns 1, 0 otherwise.
-  res <- 0
-  for (n in 1:nrow(cnvs)) {
-    tmp_reg <- get_region(cnvs[n], prop)
-    overl <- min(my_reg[3], tmp_reg[3]) - max(my_reg[2], tmp_reg[2]) + 1
-    if (overl >= my_reg[4] & overl >= tmp_reg[4]) {
-      res <- 1
-      break # unnecessary?
-    }
-  }
-  return(res)
-}
-
-# Uniform chromosome notation
-#
-# This is a function for internal use in the package, it handles
-# the standardize process of chromosome notation within the other functions.
-#
-# @param DT_in, a \code{data.table} with a columns named "chr"
-#
-# @return the same \code{data.table} in input with the "chr" uniformed to the
-#   notation "1", "2", ... , "23", "24" for the chromosomes 1:22, X and Y
-#
-# @export
-#
-# @import data.table
-#
-# @examples
-# DT <- data.table::data.table(chr= c("chr1", "chrX", "chr20"))
-# DT <- chr_uniform(DT)
-# DT
-
-
-chr_uniform <- function(DT_in) {
-  if (!"chr" %in% colnames(DT_in))
-    stop("No 'chr' columns found!\n")
-  if (!is.data.table(DT_in))
-    stop("'DT_in' must be a dat.table1\n")
-
-  DT_in[, chr := tolower(gsub(" ", "", chr))]
-  # this won't work if the the notation in the column is not coherent, like the
-  # results of biomaRt::getBM()
-  if (substr(DT_in$chr[1], 1, 3) == "chr")
-    DT_in[, chr := substring(chr, 4)]
-  # or sub(".+(\\d+|x|y)", "\\1", chr)
-  DT_in[chr == "x", chr := "23"][chr == "y", chr := "24"]
-  # drop calls not in chrs 1:22, X, Y
-  DT_in <- DT_in[chr %in% as.character(1:24), ]
-
-  return(DT_in)
-}
