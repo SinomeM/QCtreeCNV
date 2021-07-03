@@ -1,7 +1,5 @@
 
 ## TODO!
-# 1. UPDATE DATA FORMAT (e.g. end -> stop)!!!
-# 2. UPDATE chruniform !!!!!
 # 3. Add micro documentation in each function
 
 get_region <- function(my_line, prop = 1) {

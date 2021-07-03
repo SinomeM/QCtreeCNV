@@ -28,7 +28,7 @@
 # DT <- cnvrs_create(penn_22, hg19_chr_arms)
 
 ## TODO!
-# 1. UPDATE DATA FORMAT (e.g. end -> stop)!!!
+# 1. CNVRs should be computed per LOCUS here!!!!
 # 1. add last step, merge 75% overlap CNVRs + update CNVRs + update CNVs
 # 2. update documentation here
 
