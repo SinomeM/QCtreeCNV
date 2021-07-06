@@ -23,16 +23,14 @@
 # @export
 #
 # @import data.table
-#
-# @examples
-# DT <- cnvrs_create(penn_22, hg19_chr_arms)
+
 
 ## TODO!
 # 1. CNVRs should be computed per LOCUS here!!!!
 # 1. add last step, merge 75% overlap CNVRs + update CNVRs + update CNVs
-# 2. update documentation here
+# 2. update documentation and initial checks
 
-cnvrs_create <- function(cnvs, chr_arms, prop = 0.3) {
+cnvrs_create <- function(cnvs, chr_arms, prop = 0.3, final_merge = T) {
   # check input
   if (!is.data.table(cnvs) | !is.data.table(chr_arms))
     stop("Inputs must be data.table!\n")
@@ -171,6 +169,14 @@ cnvrs_create <- function(cnvs, chr_arms, prop = 0.3) {
   # count the final CNVs frequency per CNVRs
   freqs <- res[, .N, by = cnvr]
   cnvrs[, freq := freqs[match(cnvrs$r_ID, freqs$cnvr), N]]
+
+  # Merge overlapping CNVRs regardless of the CNVs contained
+  if (final_merge) {
+    meassage("Merging 75% overlapping CNVRs regardless of the CNVs")
+    tmp <- merge75(cnvrs, res)
+    cnvrs <- tmp[[1]]
+    res <- tmp[[2]]
+  }
 
   return(list(cnvrs[!is.na(chr), ], res))
 }
@@ -386,3 +392,44 @@ remove_cnvs <- function(DT, prop) {
   return(DT)
 }
 
+merge75 <- function(cnvrs, cnvs) {
+
+  cnvrs_edit <- copy(cnvrs)
+  for (i in 1:nrow(cnvrs)) {
+    # c(chr, st, en, len)
+    rid <- cnvrs$CNVR_ID[i]
+    if (nrow(cnvrs_edit[CNVR_ID == rid,]) == 0 ) next
+
+    reg <- get_region(cnvrs[i])
+    cc <- cnvrs_edit[chr == reg[1] & start < reg[3] & end > reg[2] &
+                    CNVR_ID !=rid,]
+
+    if (nrow(cc) < 1) next
+    comp <- c(cnvrs$CNVR_ID[i])
+
+    for (n in 1:nrow(cc)) {
+      overlap <- min(reg[3], cc$end[n]) - max(reg[2], cc$start[n]) +1
+      if (overlap >= 0.75*reg[4] & overlap >= 0.75*cc[n, end-start+1])
+        comp <- c(comp, cc[n,CNVR_ID])
+    }
+
+    # update CNVR_ID
+    if (length(comp) >1) {
+      if (nrow(cnvrs_edit[CNVR_ID %in% comp,]) < 2) next
+      nst <- min(cnvrs_edit[CNVR_ID %in% comp, start])
+      nsp <- min(cnvrs_edit[CNVR_ID %in% comp, end])
+      nfr <- sum(cnvrs_edit[CNVR_ID %in% comp, freq])
+      newline <- cnvrs_edit[CNVR_ID == comp[1],]
+      newline[,`:=` (start = nst, end = nsp, freq = nfr)]
+      cnvrs_edit <- rbind(cnvrs_edit[!CNVR_ID %in% comp,], newline)
+      # update also CNVs
+      cnvs[cnvrs %in% comp, cnvrs := comp[1]]
+    }
+    if (cnvrs[, sum(freq)] != cnvrs_edit[, sum(freq)]) {
+      message("Ouch!")
+      break
+    }
+  }
+
+  return(list(cnvrs_edit, cnvs))
+}
