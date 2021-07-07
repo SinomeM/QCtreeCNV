@@ -136,7 +136,13 @@ uniform_GT_CN <- function(DT_in) {
 # <int> when needed (of GT and CN)
 
 getline_cnv <- function(cnv) {
-  myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, cnv$CNVR_ID)
+  st <- cnv$start
+  en <- cnv$end
+  if ("length" %in% colnames(cnv)) l <- cnv$length
+  else l <- en - st + 1
+  cen <- st + l/2
+  myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, cnv$CNVR_ID,
+              st, en, l, cen)
   return(myline)
 }
 
