@@ -64,19 +64,142 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   # classic measures, LRRSD, BAFdrift and GCWF
   message("# -------------------------- #\n",
           "Step 1, QC outliers removal")
-  cnvsOUT[, st1 := -1]
-  # these pass the check
-  cnvsOUT[LRRSD <= maxLRRSD & BAFdrift <= maxBAFdrift &
-          between(GCWF, minGCWF, maxGCWF,incbounds=T), st1 := 1]
-  # these are excluded
-  cnvsOUT[st1 == -1, st1 := 0][st1 == 0, excl := 1]
-  message("# ", nrow(cnvsOUT[excl == 1, ]),
-          "calls are from QC outlier samples.\n")
+  cnvsOUT <- step1(cnvsOUT)
 
 
   ### STEP 2 & 3 CNVRs ###
   message("# -------------------------- #\n",
           "Steps 2 and 3, CNVRs")
+  cnvrs_groups <- sortCNVRs(cnvs, cnvrs, loci, commonCNVRsMinFreq)
+
+  # STEP 2
+  cnvsOUT <- step2(cnvsOUT, cnvrs_groups)
+
+  # STEP 3
+  cnvsOUT <- step3(cnvsOUT, cnvrs_groups)
+
+
+
+  ### STEP 4, logr1, BAFc & BAFb checks 1 ###
+  message("# -------------------------- #\n",
+          "Step 4, logr1, BAFc & BAFb for small CNVRs calls")
+  cnvsOUT<- step4(cnvsOUT, st4minlogr1, st4maxlogr1,
+                  st4maxBAFcDEL, st4maxBAFcDUP, st4maxBAFbDEL)
+
+
+  ### STEP 5, LRRSDlocus, mLRRlocus ###
+  message("# -------------------------- #\n",
+          "Step 5, LRRSD and mean LRR checks inside locus of interest\n",
+          "plus logr1, BAFc & BAFb check for all calls")
+  cnvsOUT <- step5(cnvsOUT, 0, -0.3, st5maxLRRSDlocus,
+                   st5maxBAFcDEL, st5maxBAFcDUP, st5maxBAFbDEL,
+                   st4maxBAFcDEL, st4maxBAFbDEL)
+
+  ### RETURN ###
+  message("# -------------------------- #\n",
+          "Pipeline complete!")
+  # check all CNVs were evaluated
+  if (nrow(cnvsOUT[excl == -1,] == 0)) message("All CNVs were evaluated")
+
+  # remove temporary columns
+  if (clean_out) cnvsOUT[, c("st1", "st2", "st3", "st4", "st5") := NULL]
+
+  # return good and excluded as a list
+  return(list(cnvsOUT[excl == 0, ], cnvsOUT[excl == 1, ]))
+}
+
+
+step1 <- fucntion(cnvs) {
+  cnvs[, st1 := -1]
+  # these pass the check
+  cnvs[LRRSD <= maxLRRSD & BAFdrift <= maxBAFdrift &
+       between(GCWF, minGCWF, maxGCWF,incbounds=T), st1 := 0]
+  # these are excluded
+  cnvs[st1 == -1, st1 := 1][st1 == 1, excl := 1]
+  #   message("# ", nrow(cnvs[excl == 1, ]),
+  #           "calls are from QC outlier samples.\n")
+  return(cnvs)
+}
+
+step2 <- function(cnvs, cnvrs) {
+  cnvs[, st2 := -1]
+  # CNVs from step 1 == 0 that are in a cnvrA will pass step 2 (to good CNVs)
+  cnvs[st1 == 0 & CNVR_ID %in% cnvrs[[1]], `:=` (st2 = 1, excl = 0)]
+  # CNVs from step 1 == 0 that are in a cnvrA will fail step 2 (to step3)
+  cnvs[st1 == 0 & !CNVR_ID %in% cnvrs[[1]], st2 := 0]
+
+  # check all CNVs from step 1 are assigned
+  if (nrow(cnvs[st1 == 0,] != nrow(cnvs[st2 %in% c(1,0), ])))
+    stop("There is a problem in step 2")
+  return(cnvs)
+}
+
+
+step3 <- function(cnvs, cnvrs) {
+  cnvs[, st3 := -1]
+  # CNVs from step 2 == 0 that are in a cnvrB will go to step 4
+  # CNVs from step 2 == 0 that are in a cnvrC will go to step 5
+  cnvs[st2 == 0 & CNVR_ID %in% cnvrs[[2]], st3 := 1]
+  cnvs[st2 == 0 & CNVR_ID %in% cnvrs[[3]], st3 := 0]
+
+  # check all CNVs from step 2 are assigned
+  if (nrow(cnvs[st2 == 0,] != nrow(cnvs[st3 %in% c(1,0), ])))
+    stop("There is a problem in step 3")
+  return(cnvs)
+}
+
+step4 <- function(cnvs, minlogr1, maxlogr1, maxbafcdel, maxbafcdup, maxbafbdel) {
+  cnvs[, st4 := -1]
+  # Deletions and duplications are treated differently here
+  # Takes calls from st3 == 1
+  # If log1 or at least one between BAFc and BAFb are whithin limits, it goes
+  # to step 5, i.e. st4 = 0
+  # If logr1 AND BAFc | BAFb are out of limits (i.e. consistent with small CNVR)
+  # exclude them
+  cnvs[st3 == 1 & GT == 1 & (between(logr1, minlogr1, maxlogr1) |
+          (BAFc <= maxbafcdel | BAFb <= maxbafbdel)), st4 := 0]
+  cnvs[st3 == 1 & GT == 1 & st4 == -1, `:=` (st4 = 1, excl = 1)]
+
+  cnvs[st3 == 1 & GT == 2 & (between(logr1, minlogr1, maxlogr1) |
+          BAFc <= maxbafcdup), st4 := 0]
+  cnvs[st3 == 1 & GT == 2 & st4 == -1, `:=` (st4 = 1, excl = 1)]
+
+  # check all CNVs from step 3 are assigned
+  if (nrow(cnvs[st3 == 1,] != nrow(cnvs[st4 %in% c(1,0), ])))
+    stop("There is a problem in step 4")
+  return(cnvs)
+}
+
+step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
+                  maxbafcdel, maxbafcdup, maxbafbdel,
+                  maxbafcdel2, maxbafbdel2) {
+  cnvs[, st5 := -1]
+  # Takes calls from st3 = 0 and st4 = 0
+
+  # mLRRlocus particularly out
+  cnvs[GT == 1 & st3 == 0 & st4 == 0 & mLRRlocus > maxmLRRdel, `:=` (st5 = 1, excl = 1)]
+  cnvs[GT == 2 & st3 == 0 & st4 == 0 & mLRRlocus < minmLRRdup, `:=` (st5 = 1, excl = 1)]
+
+  # In calls with high LRRSDlocus, check BAFc and BAFb, if at least one of them
+  # well out of range or both with lower thresholds then it's excluded
+  # Deletions
+  cnvs[GT == 1 & st3 == 0 & st4 == 0 & LRRSDlocus > maxlrrsd &
+          ((BAFc <= maxbafcdel | BAFb <= maxbafbdel) |
+           (BAFc <= maxbafcdel2 & BAFb <= maxbafbdel2)), `:=` (st5 = 1, excl = 1)]
+  # Duplications
+  cnvs[GT == 2 & st3 == 0 & st4 == 0 & LRRSDlocus > maxlrrsd &
+          BAFc <= maxbafcdup, `:=` (st5 = 1, excl = 1)]
+
+  cnvs[GT == 1 & st3 == 0 & st4 == 0 & st5 == -1, `:=` (st5 = 0, excl = 0)]
+
+  # check all CNVs from step 3 are assigned
+  if (nrow(cnvs[st3 == 0 & st4 == 0,] != nrow(cnvs[st5 %in% c(1,0), ])))
+    stop("There is a problem in step 5")
+  return(cnvs)
+}
+
+
+sortCNVRs <- function(cnvs, loci, cnvrs, minFreq) {
 
   message("Checking CNVRs frequency and overlaps with the loci")
   # Sort CNVRs in the different categories, done per locus
@@ -96,15 +219,15 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
 
   for (loc in unique(loci$locus)) {
 
-    nCNVS <- nrow(cnvsOUT[locus == loc, ])
+    nCNVS <- nrow(cnvs[locus == loc, ])
 
     # the two CNVRs frequency thresholds, 1% (rare) and 5% (common)
     th1 <- nCNVS*0.01
     th5 <- nCNVS*0.05
     # IF setted commonCNVRsMinFreq override th5, if th5 is smaller for the
     # specific locus. This is useful to avoid excluding calls in very rare loci
-    if (!is.na(commonCNVRsMinFreq)) {
-      if (commonCNVRsMinFreq > th5) th5 <- commonCNVRsMinFreq
+    if (!is.na(minFreq)) {
+      if (minFreq > th5) th5 <- minFreq
     }
 
     loc_line <- getline_locus(loci[locus == loc, ])
@@ -122,88 +245,5 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
     cnvrsB <- c(cnvrsB, lcnvrs[freq >= th5 & op <= 0.55, CVNR_ID])
     cnvrsC <- c(cnvrC, lcnvrs[, CVNR_ID][!lcnvrs[, CNVR_ID] %in% c(cnvrsA,cnvrsB)])
   }
-
-  # STEP 2
-  cnvsOUT[, st2 := -1]
-  # CNVs from step 1 == 0 that are in a cnvrA will pass step 2 (to good CNVs)
-  cnvsOUT[st1 == 0 & CNVR_ID %in% cnvrsA, `:=` (st2 = 1, excl = 0)]
-  # CNVs from step 1 == 0 that are in a cnvrA will fail step 2 (to step3)
-  cnvsOUT[st1 == 0 & !CNVR_ID %in% cnvrsA, st2 := 0]
-  # check all CNVs from step 1 are assigned
-  if (nrow(cnvsOUT[st1 == 0,] != nrow(cnvsOUT[st2 %in% c(1,0), ])))
-    stop("There is a problem in step 2")
-
-  # STEP 3
-  cnvsOUT[, st3 := -1]
-  # CNVs from step 2 == 0 that are in a cnvrB will go to step 4
-  # CNVs from step 2 == 0 that are in a cnvrC will go to step 5
-  cnvsOUT[st2 == 0 & CNVR_ID %in% cnvrB, st3 := 1]
-  cnvsOUT[st2 == 0 & CNVR_ID %in% cnvrC, st3 := 0]
-
-  # check all CNVs from step 2 are assigned
-  if (nrow(cnvsOUT[st2 == 0,] != nrow(cnvsOUT[st3 %in% c(1,0), ])))
-    stop("There is a problem in step 3")
-
-
-
-  ### STEP 4, logr1, BAFc & BAFb checks 1 ###
-  message("# -------------------------- #\n",
-          "Step 4, logr1, BAFc & BAFb for small CNVRs calls")
-  cnvsOUT[, st4 := -1]
-  # Deletions and duplications are treated differently here
-  # Takes calls from st3 == 1
-  # If log1 or at least one between BAFc and BAFb are whithin limits, it goes
-  # to step 5, i.e. st4 = 0
-  # If logr1 AND BAFc | BAFb are out of limits (i.e. consistent with small CNVR)
-  # exclude them
-  cnvsOUT[st3 == 1 & GT == 1 & (between(logr1, st4minlogr1, st4maxlogr1) |
-          (BAFc <= st4maxBAFcDEL | BAFb <= st4maxBAFbDEL)), st4 := 0]
-  cnvsOUT[st3 == 1 & GT == 1 & st4 == -1, `:=` (st4 = 1, excl = 1)]
-
-  cnvsOUT[st3 == 1 & GT == 2 & (between(logr1, st4minlogr1, st4maxlogr1) |
-          BAFc <= st4maxBAFcDUP), st4 := 0]
-  cnvsOUT[st3 == 1 & GT == 2 & st4 == -1, `:=` (st4 = 1, excl = 1)]
-
-  # check all CNVs from step 3 are assigned
-  if (nrow(cnvsOUT[st3 == 1,] != nrow(cnvsOUT[st4 %in% c(1,0), ])))
-    stop("There is a problem in step 4")
-
-
-  ### STEP 5, LRRSDlocus, mLRRlocus ###
-  message("# -------------------------- #\n",
-          "Step 5, LRRSD and mean LRR checks inside locus of interest\n",
-          "plus logr1, BAFc & BAFb check for all calls")
-  cnvsOUT[, st5 := -1]
-  # Takes calls from st3 = 0 and st4 = 0
-
-  # mLRRlocus particularly out
-  cnvsOUT[GT == 1 & st3 == 0 & st4 == 0 & mLRRlocus > 0, `:=` (st5 = 1, excl = 1)]
-  cnvsOUT[GT == 2 & st3 == 0 & st4 == 0 & mLRRlocus < -0.3, `:=` (st5 = 1, excl = 1)]
-
-  # In calls with high LRRSDlocus, check BAFc and BAFb, if at least one of them
-  # well out of range or both with lower thresholds then it's excluded
-  # Deletions
-  cnvsOUT[GT == 1 & st3 == 0 & st4 == 0 & LRRSDlocus > st5maxLRRSDlocus &
-          ((BAFc <= st5maxBAFcDEL | BAFb <= st5maxBAFbDEL) |
-           (BAFc <= st4maxBAFcDEL & BAFb <= st4maxBAFbDEL)), `:=` (st5 = 1, excl = 1)]
-  # Duplications
-  cnvsOUT[GT == 2 & st3 == 0 & st4 == 0 & LRRSDlocus > st5maxLRRSDlocus &
-          BAFc <= st5maxBAFcDUP, `:=` (st5 = 1, excl = 1)]
-
-  cnvsOUT[GT == 1 & st3 == 0 & st4 == 0 & st5 == -1, `:=` (st5 = 0, excl = 0)]
-
-  ### RETURN ###
-  message("# -------------------------- #\n",
-          "Pipeline complete!")
-  # check all CNVs were evaluated
-  if (nrow(cnvsOUT[excl == -1,] == 0)) message("All CNVs were evaluated")
-
-  # remove temporary columns
-  if (clean_out) cnvsOUT[, c("st1", "st2", "st3", "st4", "st5") := NULL]
-
-  # return good and excluded as a list
-  return(list(cnvsOUT[excl == 0, ], cnvsOUT[excl == 1, ]))
+  return(list(cnvrsA, cnvrsB, cnvrsC))
 }
-
-
-
