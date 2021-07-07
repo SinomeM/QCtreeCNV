@@ -13,7 +13,7 @@
 # 1. move here the code from the RMD file from GDK and standardize it
 # 2. minimal documentation, in particular on the input files!
 
-extractMetrics <- function(loci, cnvs, int_rds_path, tmp_rds_path) {
+extractMetrics <- function(loci, cnvs, pennQC, int_rds_path, tmp_rds_path) {
 
   # initial checks
   # # TODO
@@ -21,16 +21,14 @@ extractMetrics <- function(loci, cnvs, int_rds_path, tmp_rds_path) {
   ids <- unique(cnvs$sample_ID)
 
   for (l in 1:nrow(loci)) {
-    lcc <- loci30$chr[l]
-    lst <- loci30$start[l]
-    lsp <- loci30$stop[l]
-    ll <- loci30$locus[l]
-    dt <- data.table(pid = pids)
-    message(l, " ", ll)
+    loc <- getline_locus(loci[i])
+    dt <- data.table(sample_ID = ids)
+    message("Locus #", l, ": ", ll)
 
-    for (p in pids) {
-      tmp <- readRDS(paste0("rds/",s,"/",p,".rds"))[Chr == substring(lcc, 4)][
-               between(Position, lst, lsp),]
+    for (s in ids) {
+      tmp <-
+        readRDS(file.path(int_rds_path,s,".rds"))[Chr == loc[2] &
+                                                  between(Position, loc[3], loc[4]),]
 
       bafc <- nrow(tmp[between(`B Allele Freq`, 0.4, 0.6, incbounds=T), ]) /
                 nrow(tmp)
@@ -39,33 +37,41 @@ extractMetrics <- function(loci, cnvs, int_rds_path, tmp_rds_path) {
                        `B Allele Freq` %in% c(0.2, 0.8), ]) / nrow(tmp)
 
       # locus measures (compute them regardless of the presence of a call)
-      dt[pid == p, `:=` (mLRRlocus = mean(tmp[, `Log R Ratio`], na.rm=T),
+      dt[sample_ID == s, `:=` (mLRRlocus = mean(tmp[, `Log R Ratio`], na.rm=T),
                          LRRSDlocus = sd(tmp[, `Log R Ratio`], na.rm=T),
                          BAFc = bafc, BAFb = bafb,
-                         mBAFlocus = mean(tmp[, `B Allele Freq`], na.rm=T),
                          centLocus = lst+(lsp-lst+1)/2 ,lenLocus=lsp-lst+1)]
 
       # check if this sample has a call in the locus
-      pput <- put[Locus == ll & pid == p,]
-      if (nrow(pput) == 0) {
-        dt[pid == p, `:=` (mLRRcall = NA_real_, LRRSDcall = NA_real_,
-                           mBAFcall= NA_real_,
-                           centCall = NA_real_, lenCall = NA_real_)]
+      put <- cnvs[Locus == ll & sample_ID == s,]
+      if (nrow(put) == 0) {
+        dt[sample_ID == s, `:=` (mLRRcall = NA_real_, LRRSDcall = NA_real_,
+                                 centCall = NA_real_, lenCall = NA_real_)]
       } else {
-        cst <- pput[, start]
-        csp <- pput[, stop]
-        tmp1 <- tmp[between(Position, cst, csp),]
-        dt[pid == p, `:=` (mLRRcall = mean(tmp1[, `Log R Ratio`], na.rm=T),
-                           LRRSDcall = sd(tmp1[, `Log R Ratio`], na.rm=T),
-                           mBAFcall = mean(tmp1[, `B Allele Freq`], na.rm=T),
-                           centCall = cst+(csp-cst+1)/2,
-                           lenCall = csp-cst+1)]
+        # A sample can have only one call per locus
+        if (nrow(put) > 1) stop(paste0("Sample ", s, " has more than one call in",
+                                       " locus ", loc[1]))
+        putline <- getline_cnv(put)
+        tmp1 <- tmp[between(Position, putline[6], putline[7]),]
+        dt[sample_ID == s, `:=` (mLRRcall = mean(tmp1[, `Log R Ratio`], na.rm=T),
+                                 LRRSDcall = sd(tmp1[, `Log R Ratio`], na.rm=T),
+                                 centCall = putline[9], lenCall = putline[8])]
       }
     }
-    saveRDS(dt, paste0("dts/",s,"/", ll, ".rds"))
+    # rind all loci together
+    dtOUT <- rbind(dtOUT, dt)
   }
 
+  return(dtOUT)
+}
 
+# TODO:
+# Integrate the code below in the main function,
+# the less step required the better.
+# Do not compute stuff not needed.
+# Remember that the eval results are only in our case
+
+{
 dt <- data.table()
 
 for (samp in c("2012", "2015i")) {
