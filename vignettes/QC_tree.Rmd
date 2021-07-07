@@ -113,7 +113,7 @@ Table 2 consist of [...]
 | :----------  | :----:    | :---- |
 | sample_ID    | \<chr\>   | _     |
 | locus        | \<chr\>   | _     |
-| put_carrier  | \<logi\>  | is the sample a putative carrier for this locus?\* |
+| putCarrier  | \<logi\>  | is the sample a putative carrier for this locus?\* |
 | logr1        | \<num\>   | \*\*     |
 | LRRSDlocus   | \<num\>   | \*\*     |
 | BAFc         | \<num\>   | \*\*     |

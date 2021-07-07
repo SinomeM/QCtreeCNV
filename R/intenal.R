@@ -156,6 +156,11 @@ getline_cnvr <- function(cnvr) {
 
 # same but for loci
 getline_locus <- function(locus) {
-  myline <- c(locus$locus, locus$chr, locus$start, locus$end, locus$length)
+  st <- locus$start
+  en <- locus$end
+  if ("length" %in% colnames(cnv)) l <- cnv$length
+  else l <- en - st + 1
+  cen <- st + l/2
+  myline <- c(locus$locus, locus$chr, st, en, l, cen)
   return(myline)
 }

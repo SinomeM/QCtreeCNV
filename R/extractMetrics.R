@@ -21,6 +21,7 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path, tmp_rds_path) {
   ids <- unique(cnvs$sample_ID)
 
   for (l in 1:nrow(loci)) {
+    # info on locus
     loc <- getline_locus(loci[i])
     dt <- data.table(sample_ID = ids)
     message("Locus #", l, ": ", ll)
@@ -36,95 +37,48 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path, tmp_rds_path) {
                        between(`B Allele Freq`, 0.6, 0.8, incbounds=F) |
                        `B Allele Freq` %in% c(0.2, 0.8), ]) / nrow(tmp)
 
+      # sample QC measure from PennCNV
+      qcline <- pennQC[sample_ID == s, ]
+      dt[sample_ID == s, `:=` (BAFdrift = qcline$BAFdrift,
+                               LRRSD = qcline$LRRSD,
+                               GCWF = qcline$GCWF)]
+
       # locus measures (compute them regardless of the presence of a call)
       dt[sample_ID == s, `:=` (mLRRlocus = mean(tmp[, `Log R Ratio`], na.rm=T),
                          LRRSDlocus = sd(tmp[, `Log R Ratio`], na.rm=T),
-                         BAFc = bafc, BAFb = bafb,
-                         centLocus = lst+(lsp-lst+1)/2 ,lenLocus=lsp-lst+1)]
+                         BAFc = bafc, BAFb = bafb)]
 
       # check if this sample has a call in the locus
       put <- cnvs[Locus == ll & sample_ID == s,]
       if (nrow(put) == 0) {
-        dt[sample_ID == s, `:=` (mLRRcall = NA_real_, LRRSDcall = NA_real_,
-                                 centCall = NA_real_, lenCall = NA_real_)]
+        dt[sample_ID == s, `:=` (putCarrier= F, mLRRcall = NA_real_,
+                                 centDistProp = NA_real_, overlapProp = NA_real_)]
       } else {
         # A sample can have only one call per locus
         if (nrow(put) > 1) stop(paste0("Sample ", s, " has more than one call in",
                                        " locus ", loc[1]))
+        # info on putative call, if present
         putline <- getline_cnv(put)
         tmp1 <- tmp[between(Position, putline[6], putline[7]),]
-        dt[sample_ID == s, `:=` (mLRRcall = mean(tmp1[, `Log R Ratio`], na.rm=T),
-                                 LRRSDcall = sd(tmp1[, `Log R Ratio`], na.rm=T),
-                                 centCall = putline[9], lenCall = putline[8])]
+        ov <- min(loc[4], putline[7]) - max(loc[3], putline[6]) +1
+        if (ov < 0) stop("Something is wrong, overlap can't be negative)")
+        dt[sample_ID == s, `:=` (putCarrier =T,
+                                 mLRRcall = mean(tmp1[, `Log R Ratio`], na.rm=T),
+                                 centDistProp = abs(loc[6] - putline[9]) / loc[5],
+                                 overlapProp = putline[8] / loc[5])]
       }
-    }
-    # rind all loci together
-    dtOUT <- rbind(dtOUT, dt)
-  }
 
+      dt[,logr1 := log(abs(mLRRcall / mLRRlocus))]
+
+      # rind all samples and loci together
+      dtOUT <- rbind(dtOUT, dt)
+
+    } # end samples loop
+  } # end loci loop
+
+  # sort columns
+  dtOUT <- dtOUT[ , .(sample_ID, locus, putCarrier, LRRSD, BAFdrift, GCWF,
+                      logr1, LRRSDlocus, BAFc, BAFb, centDistProp, overlapProp)]
   return(dtOUT)
 }
 
-# TODO:
-# Integrate the code below in the main function,
-# the less step required the better.
-# Do not compute stuff not needed.
-# Remember that the eval results are only in our case
-
-{
-dt <- data.table()
-
-for (samp in c("2012", "2015i")) {
-  message(samp)
-  files <- list.files(paste0("dts/",samp,"/"))
-
-  for (f in files) {
-    message(f)
-    tmp <- readRDS(paste0("dts/",samp,"/",f))
-    ll <- gsub(".rds", "", f)
-    tmp$locus <- ll
-    tmp$sample <- samp
-    if (samp == "2012") {
-      put <- put2012[Locus == ll,]
-    } else
-        put <- put2015i[Locus == ll,]
-    # vectors of pids
-    pput <- put[, pid]
-    pputT <- put[cons_eval == 1, pid]
-    pputF <- put[cons_eval == 2, pid]
-    pputU <- put[cons_eval == 3, pid]
-    pputNA <- put[is.na(cons_eval), pid]
-
-    # update tmp
-    tmp[pid %in% pput, putCarrier := T][!pid %in% pput, putCarrier := F][
-          pid %in% pputT, CNV := 1][pid %in% pputF, CNV := 2][
-          pid %in% pputU, CNV := 3][pid %in% pputNA, CNV := NA]
-
-    lst <- loci30[locus == ll, start]
-    lsp <- loci30[locus == ll, stop]
-    overlaps <- pmin(put[match(pput, pid),stop],lsp) - max(put[match(pput, pid),start],lst) + 1
-    tmp[match(pput, pid), overlap:=overlaps]
-
-    dt <- rbind(dt, tmp)
-  }
-}
-
-dt[, r1:=abs(mLRRcall / mLRRlocus)][, logr1 := log(r1 + 0.000001)][
-     , centDistProp := abs(centLocus-centCall)/lenLocus]
-dt[, CNVedit := CNV][is.na(CNV) & putCarrier ==T, CNVedit := 2][CNV == 3, CNVedit := 2]
-dt[, r2 := abs(LRRSDcall/LRRSDlocus)]
-dt[, overlapProp:= overlap/lenLocus]
-dt[, r3 := abs(mBAFcall/mBAFlocus)][, logr3 := log(r3 + 0.000001)]
-
-dt[,id := paste0(sample,locus,pid)]
-put2012[, id := paste0("2012",Locus,pid)]
-put2015i[, id := paste0("2015i",Locus,pid)]
-setorder(dt, id) ; setorder(put2012, id) ; setorder(put2015i, id)
-dt[id %in% put2012$id,  `:=` (type = put2012$Type, conf = put2012$conf)][
-     id %in% put2015i$id,  `:=` (type = put2015i$Type, conf = put2015i$conf)]
-
-dt <- dt[, .(pid,locus,sample,putCarrier,CNV,CNVedit,type,conf,
-             mLRRlocus,mLRRcall,r1,logr1,LRRSDlocus,LRRSDcall,r2,
-             BAFc,BAFb,mBAFlocus,mBAFcall,r3,logr3,
-             centCall,centLocus,centDistProp,lenLocus,overlapProp)]
-}
