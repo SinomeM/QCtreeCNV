@@ -7,6 +7,8 @@ devtools::test()
 
 devtools::load_all()
 
+devtools::check()
+
 devtools::build()
 
 library(data.table)

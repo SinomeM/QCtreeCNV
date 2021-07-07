@@ -109,7 +109,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
 }
 
 
-step1 <- fucntion(cnvs) {
+step1 <- function(cnvs) {
   cnvs[, st1 := -1]
   # these pass the check
   cnvs[LRRSD <= maxLRRSD & BAFdrift <= maxBAFdrift &

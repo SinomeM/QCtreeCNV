@@ -4,7 +4,7 @@
 \alias{extractMetrics}
 \title{Extratc QC metrics}
 \usage{
-extractMetrics(loci, cnvs, int_rds_path, tmp_rds_path)
+extractMetrics(loci, cnvs, pennQC, int_rds_path, tmp_rds_path)
 }
 \description{
 \code{extractMetrics()} extract the QC metrics from the raw data in RDS
