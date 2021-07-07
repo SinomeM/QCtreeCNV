@@ -99,7 +99,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
       if (commonCNVRsMinFreq > th5) th5 <- commonCNVRsMinFreq
     }
 
-    loc_line <- getline_locus(loci, loc)
+    loc_line <- getline_locus(loci[locus == loc, ])
     # all overlapping CNVRs, it is not a perfect methods but the
     # CNVRs that can give problems are the very large ones, that
     # would be saved anyway
@@ -197,30 +197,4 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
 }
 
 
-# ---------------------
 
-# return sample_ID, locus, GT and CN as a vector of <chr>
-# data.table is smart enough to convert the values back to
-# <int> when needed (of GT and CN)
-
-getline_cnv <- function(cnvs, i) {
-  ll <- cnvs[i]
-  myline <- c(ll$sample_ID, ll$locus, ll$GT, ll$CN, ll$CNVR_ID)
-  return(myline)
-}
-
-
-# return start end and freq
-
-getline_cnvr <- (cnvrs, cnvr_id) {
-  ll <- cnvrs[CNVR_ID == cnvr_id, ]
-  myline <- c(ll$start, ll$end, ll$freq)
-  return(myline)
-}
-
-# same but for loci
-getline_locus <- function(loci, locus) {
-  myline <- c(locus, loci[locus == locus, chr], loci[locus == locus, start],
-              loci[locus == locus, end], loci[locus == locus, length])
-  return(myline)
-}

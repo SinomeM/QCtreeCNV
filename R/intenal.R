@@ -127,3 +127,29 @@ uniform_GT_CN <- function(DT_in) {
 
   return(DT_in)
 }
+
+
+# ---------------------
+
+# return sample_ID, locus, GT and CN as a vector of <chr>
+# data.table is smart enough to convert the values back to
+# <int> when needed (of GT and CN)
+
+getline_cnv <- function(cnv) {
+  myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, cnv$CNVR_ID)
+  return(myline)
+}
+
+
+# return start end and freq
+
+getline_cnvr <- (cnvr) {
+  myline <- c(cnvr$start, cnvr$end, cnvr$freq)
+  return(myline)
+}
+
+# same but for loci
+getline_locus <- function(locus) {
+  myline <- c(locus$locus, locus$chr, locus$start, locus$end, locus$length)
+  return(myline)
+}
