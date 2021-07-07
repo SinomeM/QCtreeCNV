@@ -19,6 +19,19 @@ This scheme gives a good first peek at this process.
 
 ![QCtree](./vignettes/QCtree.png)
 
+## Install
+
+You can install the package via:
+
+```
+devtools::install_github("sinomem/QCtreeCNV")
+```
+
 ## Details
 
-See the package vignettes for more details.
+See the package vignettes for more details. Assuming the package is installed
+in your system you can do:
+
+```
+browseVignettes("QCtreeCNV")
+```
