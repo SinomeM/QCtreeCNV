@@ -1,11 +1,18 @@
+#' CNVs QC Filtering Tree
+#'
+#' The main functions of the \code{QCtreeCNV} package
+#'
+#' @export
+#'
+#' @import data.table
 
 ## TODO!
-# 1. Move here most of the code from exlcudeCNVs.R, all that can be reused
-# 2. Integrate additional steps in the pipeline
-# 3. Update the suggested values for each step, reflecting the new run in GDK
-#    (after initial QC outliers removal)
-# 4. Some documentation, keep in mind most of it will live in more discoursive
+
+# 1. Some documentation, keep in mind most of it will live in more discoursive
 #    manner in the vignette.
+# 2. Test and check w/ Andres default values.
+# 3. Each step as a function for easy testing
+# 4. Initial checks
 
 
 # Each step create a columns 1/0 that mean the line has passed the check (YES/NO)
@@ -31,7 +38,8 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
                    st4maxBAFbDEL=0.075, st4maxBAFbDUP=NA,
                    st5maxLRRSDlocus,
                    st5maxBAFcDEL=.05, st5maxBAFcDUP=.15,
-                   st5maxBAFbDEL=.1, st5maxBAFbDUP=NA) {
+                   st5maxBAFbDEL=.1, st5maxBAFbDUP=NA,
+                   clean_out = T) {
   ### initial checks ###
   # # TODO!
 
@@ -42,8 +50,8 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   # add index to cnvs
   cnvs[, ix := 1:nrow(cnvs)]
   # add qs measures, i.e. merge the two tables
-  setkey(cnvs, c("sample_ID", "locus")
-  setkey(qsdt, c("sample_ID", "locus")
+  setkey(cnvs, c("sample_ID", "locus"))
+  setkey(qsdt, c("sample_ID", "locus"))
   # join tables using data.table keys
   cnvsOUT <- cnvs[qsdt]
   # add excl column to keep track of the process
@@ -122,7 +130,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   # CNVs from step 1 == 0 that are in a cnvrA will fail step 2 (to step3)
   cnvsOUT[st1 == 0 & !CNVR_ID %in% cnvrsA, st2 := 0]
   # check all CNVs from step 1 are assigned
-  if (nrow(cnvsOUT[st1 == 0,] != nrow(cnvsOUT[st2 %in% c(1,0), ]))
+  if (nrow(cnvsOUT[st1 == 0,] != nrow(cnvsOUT[st2 %in% c(1,0), ])))
     stop("There is a problem in step 2")
 
   # STEP 3
@@ -133,7 +141,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   cnvsOUT[st2 == 0 & CNVR_ID %in% cnvrC, st3 := 0]
 
   # check all CNVs from step 2 are assigned
-  if (nrow(cnvsOUT[st2 == 0,] != nrow(cnvsOUT[st3 %in% c(1,0), ]))
+  if (nrow(cnvsOUT[st2 == 0,] != nrow(cnvsOUT[st3 %in% c(1,0), ])))
     stop("There is a problem in step 3")
 
 
@@ -157,7 +165,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   cnvsOUT[st3 == 1 & GT == 2 & st4 == -1, `:=` (st4 = 1, excl = 1)]
 
   # check all CNVs from step 3 are assigned
-  if (nrow(cnvsOUT[st3 == 1,] != nrow(cnvsOUT[st4 %in% c(1,0), ]))
+  if (nrow(cnvsOUT[st3 == 1,] != nrow(cnvsOUT[st4 %in% c(1,0), ])))
     stop("There is a problem in step 4")
 
 
@@ -188,11 +196,12 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   message("# -------------------------- #\n",
           "Pipeline complete!")
   # check all CNVs were evaluated
-  if (nrow(cnvsOUT[excl == -1,] == 0) message("All CNVs were evaluated")
+  if (nrow(cnvsOUT[excl == -1,] == 0)) message("All CNVs were evaluated")
 
   # remove temporary columns
-  cnvsOUT[, c("st1", "st2", "st3", "st4", "st5") := NULL]
-  # return good and excluded
+  if (clean_out) cnvsOUT[, c("st1", "st2", "st3", "st4", "st5") := NULL]
+
+  # return good and excluded as a list
   return(list(cnvsOUT[excl == 0, ], cnvsOUT[excl == 1, ]))
 }
 

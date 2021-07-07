@@ -143,7 +143,7 @@ getline_cnv <- function(cnv) {
 
 # return start end and freq
 
-getline_cnvr <- (cnvr) {
+getline_cnvr <- function(cnvr) {
   myline <- c(cnvr$start, cnvr$end, cnvr$freq)
   return(myline)
 }

@@ -1,4 +1,14 @@
 
+#' Extratc Raw Data in Specific Loci
+#'
+#' \code{extractRDS()} extract the raw LRR and BAF values in the loci from
+#' the intensity files.
+#'
+#' @export
+#'
+#' @import data.table
+
+
 ## TODO!
 # 1. minimal documentation, in particular on the input files!
 # 2. Add a progress bar?
