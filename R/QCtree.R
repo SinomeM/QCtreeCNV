@@ -40,15 +40,15 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
                    st5maxBAFcDEL=.05, st5maxBAFcDUP=.15,
                    st5maxBAFbDEL=.1, st5maxBAFbDUP=NA,
                    clean_out = T) {
+
+  ### Pre process ###
+
   ### initial checks ###
   # # TODO!
 
-  ### Pre process ###
   message("# -------------------------- #\n",
-          "Step 0, preprocess")
+          "Step 0, pre-process")
 
-  # add index to cnvs
-  cnvs[, ix := 1:nrow(cnvs)]
   # add qs measures, i.e. merge the two tables
   setkey(cnvs, c("sample_ID", "locus"))
   setkey(qsdt, c("sample_ID", "locus"))
@@ -64,7 +64,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   # classic measures, LRRSD, BAFdrift and GCWF
   message("# -------------------------- #\n",
           "Step 1, QC outliers removal")
-  cnvsOUT <- step1(cnvsOUT)
+  cnvsOUT <- step1(cnvsOUT, maxLRRSD, maxBAFdrift, minGCWF, maxGCWF)
 
 
   ### STEP 2 & 3 CNVRs ###
@@ -109,11 +109,11 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
 }
 
 
-step1 <- function(cnvs) {
+step1 <- function(cnvs, mlrrsd, mbafd, mingc, maxgc) {
   cnvs[, st1 := -1]
   # these pass the check
-  cnvs[LRRSD <= maxLRRSD & BAFdrift <= maxBAFdrift &
-       between(GCWF, minGCWF, maxGCWF,incbounds=T), st1 := 0]
+  cnvs[LRRSD <= mlrrsd & BAFdrift <= mbafd &
+       between(GCWF, mingc, maxgc,incbounds=T), st1 := 0]
   # these are excluded
   cnvs[st1 == -1, st1 := 1][st1 == 1, excl := 1]
   #   message("# ", nrow(cnvs[excl == 1, ]),
