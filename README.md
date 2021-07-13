@@ -1,6 +1,6 @@
 # QCtreeCNV
 
-![Build Status](https://travis-ci.com/SinomeM/QCtreeCNV.svg?branch=master)
+[![Build Status](https://travis-ci.com/SinomeM/QCtreeCNV.svg?branch=master)](https://travis-ci.com/SinomeM/QCtreeCNV)
 
 ## Introduction
 

@@ -13,5 +13,5 @@ devtools::build()
 
 library(data.table)
 
-f <-  QCtreeCNV:::step2
+f <-  QCtreeCNV:::step3
 debugonce(f)

@@ -54,7 +54,7 @@ test_that("CNVRs sorting behave as expected", {
 # - st1 must be either 1 or 0, only those with st1 = 0 will be considered
 # - cnvs belonging to CVNR in the first group, rr[[1]] will have st2 = 1 and exlc = 0,
 #   the others will have st2 = 0 and excl = -1
-# - cnvs with st = 1 will have st2 = -1
+# - cnvs with st1 = 1 will have st2 = -1 and excl = -1
 rr <- list(c("a", "b"), "c", "d")
 dt <- data.table(st1 = c(0, 0, 0, rep.int(1,7)),
                  CNVR_ID = c(rr[[1]], rep_len(c(rr[[2]],rr[[3]]), 7),
@@ -67,11 +67,11 @@ test_that("Step 2 behave as expected", {
             expect_equal((unique(dt$st2[1:2])), 1)
             expect_equal((unique(dt$excl[1:2])), 0)
             # st1 = 1
-            expect_equal((unique(dt$st2[4:10])), 0)
+            expect_equal((unique(dt$st2[4:10])), -1)
             expect_equal((unique(dt$excl[4:10])), -1)
             # st1 = 0 , CNV_ID !in rr[[1]]
             expect_equal(dt$st2[3], 0)
-            expect_equal(dt$excl[3], 0)
+            expect_equal(dt$excl[3], -1)
 })
 
 
@@ -84,23 +84,24 @@ test_that("Step 2 behave as expected", {
 # - cnvs with st2 = 1 will have st3 = -1
 # - all cnvs with st2 = 0 will have excl = -1
 
+# note that CNVs with st2 = 0 can not be in the first CNVRs group
+
 rr <- list("a", c("b", "c"), "d")
-dt <- data.table(st2 = c(0, 0, 0, 0, rep.int(1,6)),
+dt <- data.table(st2 = c(0, 0, 0, rep.int(1,7)),
                  CNVR_ID = c(rr[[2]], rr[[3]],
-                             rep_len(rr[[1]], 6), rr[[3]]))
+                             rep_len(rr[[1]], 6), rr[[3]]),
+                 excl = -1)
 dt <- QCtreeCNV:::step3(dt, rr)
 
 test_that("Step 3 behave as expected", {
             # st2 = 0, CNVR_ID in rr[[2]]
-            expect_equal((unique(dt$st2[1:2])), 1)
+            expect_equal((unique(dt$st3[1:2])), 1)
             # st2 = 0, CNVR_ID in rr[[3]]
-            expect_equal(dt$st2[3], 1)
-            # st2 = 0, CNVR_ID in rr[[1]]
-            expect_equal(dt$st2[4], 0)
+            expect_equal(dt$st2[3], 0)
             # st2 = 1
-            expect_equal((unique(dt$st2[5:10])), -1)
-            # st2 = 0
-            expect_equal((unique(dt$excl[1:5])), -1)
+            expect_equal((unique(dt$st3[4:10])), -1)
+            # step 3 does not touch this column
+            expect_equal((unique(dt$excl)), -1)
 })
 
 
