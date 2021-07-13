@@ -4,6 +4,10 @@ os:
   - linux
   - osx
 
+jobs:
+  allow_failures:
+    - os: osx
+
 warnings_are_errors: true
 
 cache: packages
