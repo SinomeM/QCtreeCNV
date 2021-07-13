@@ -1,4 +1,6 @@
-# README
+# QCtreeCNV
+
+![Build Status](https://travis-ci.com/SinomeM/QCtreeCNV.svg?branch=master)
 
 ## Introduction
 
