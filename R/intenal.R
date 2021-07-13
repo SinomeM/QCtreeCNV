@@ -72,18 +72,25 @@ check_overlap <- function(cnvs, my_reg, prop) {
 # -----------------------------------------------------------------------------
 
 chr_uniform <- function(DT_in) {
+
+  # standardise col name, within certain limits
+  if ("Chr" %in% colnames(DT_in)) setnames(DT_in, "Chr", "chr")
+  if ("Chromosome" %in% colnames(DT_in))
+    setnames(DT_in, "Chromosome", "chr")
+  if ("chromosome" %in% colnames(DT_in))
+    setnames(DT_in, "chromosome", "chr")
+
   if (!"chr" %in% colnames(DT_in))
     stop("No 'chr' columns found!\n")
   if (!is.data.table(DT_in))
-    stop("'DT_in' must be a dat.table1\n")
+    stop("Input must be a data.table1\n")
 
   DT_in[, chr := tolower(gsub(" ", "", chr))]
-  # this won't work if the the notation in the column is not coherent, like the
-  # results of biomaRt::getBM()
   if (substr(DT_in$chr[1], 1, 3) == "chr")
     DT_in[, chr := substring(chr, 4)]
-  # or sub(".+(\\d+|x|y)", "\\1", chr)
+
   DT_in[chr == "x", chr := "23"][chr == "y", chr := "24"]
+
   # drop calls not in chrs 1:22, X, Y
   DT_in <- DT_in[chr %in% as.character(1:24), ]
 
@@ -98,7 +105,7 @@ uniform_GT_CN <- function(DT_in) {
   if (!is.data.table(DT_in))
     stop("'DT_in' must be a data.table1\n")
 
-  # standardise col name
+  # standardise col name, within certain limits
   if ("type" %in% colnames(DT_in)) setnames(DT_in, "type", "CN")
   if ("Type" %in% colnames(DT_in)) setnames(DT_in, "Type", "CN")
 

@@ -1,4 +1,6 @@
 
+# getline_locus() #
+
 # no length column
 dtl <- data.table(locus = c("a", "b", "c", "d"), chr = c(10, 2, 3, 4),
                   start = c(1, 10, 100, 1000), end = c(1001, 2010, 3100, 5000))
@@ -24,4 +26,16 @@ test_that("getline_locus internal function" , {
             # be affected
             expect_equal(as.numeric(ln4[6]), 1050)
 })
+
+# getline_cnv() #
+
+
+# getline_cnvr() #
+
+
+# chr_uniform() #
+
+
+# uniform_GT_CN() #
+
 
