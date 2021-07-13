@@ -7,12 +7,11 @@
 cnvrs_create(cnvs, chr_arms, prop = 0.3, final_merge = T)
 }
 \arguments{
-\item{cnvs}{a \code{CNVresults} produced by \code{\link{read_results}}.}
+\item{cnvs}{lorem ipsum}
 
-\item{chr_arms}{a \code{data.table} containing chromosomal arms locations. They
-are bundled in the package for hg18, hg19 and hg38 (\code{hgXX_chr_arms}).}
+\item{chr_arms}{lorem ipsum}
 
-\item{prop}{reciprocal overlap proportion, default 0.3 (30\\%).}
+\item{prop}{reciprocal overlap proportion, default 0.3 (30\%).}
 
 \item{final_merge}{lorem ipsum}
 }
@@ -22,8 +21,7 @@ that contains the actual CNVR information, genomic location and frequency in
 the cohort. The second element is the \code{CNVresults}
 }
 \description{
-\code{cnvrs_create} compute CNVRs on a \code{CNVResutls} object, typically the
-output of \code{\link{inter_res_merge}}.
+\code{cnvrs_create} compute CNVRs from a list of CNVs.
 }
 \details{
 Copy Number Variable Regions (CNVRs) are defined as groups of reciprocal overlapping
