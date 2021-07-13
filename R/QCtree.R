@@ -129,7 +129,7 @@ step2 <- function(cnvs, cnvrs) {
   cnvs[st1 == 0 & !CNVR_ID %in% cnvrs[[1]], st2 := 0]
 
   # check all CNVs from step 1 are assigned
-  if (nrow(cnvs[st1 == 0,] != nrow(cnvs[st2 %in% c(1,0), ])))
+  if (!all(cnvs[st1 == 0, st2] %in% c(1,0)))
     stop("There is a problem in step 2")
   return(cnvs)
 }
@@ -143,7 +143,7 @@ step3 <- function(cnvs, cnvrs) {
   cnvs[st2 == 0 & CNVR_ID %in% cnvrs[[3]], st3 := 0]
 
   # check all CNVs from step 2 are assigned
-  if (nrow(cnvs[st2 == 0,] != nrow(cnvs[st3 %in% c(1,0), ])))
+  if (!all(cnvs[st2 == 0, st3] %in% c(1,0)))
     stop("There is a problem in step 3")
   return(cnvs)
 }
@@ -165,7 +165,7 @@ step4 <- function(cnvs, minlogr1, maxlogr1, maxbafcdel, maxbafcdup, maxbafbdel) 
   cnvs[st3 == 1 & GT == 2 & st4 == -1, `:=` (st4 = 1, excl = 1)]
 
   # check all CNVs from step 3 are assigned
-  if (nrow(cnvs[st3 == 1,] != nrow(cnvs[st4 %in% c(1,0), ])))
+  if (nrow(cnvs[st3 == 0,] != nrow(cnvs[st4 %in% c(1,0), ])))
     stop("There is a problem in step 4")
   return(cnvs)
 }
@@ -193,7 +193,7 @@ step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
   cnvs[GT == 1 & st3 == 0 & st4 == 0 & st5 == -1, `:=` (st5 = 0, excl = 0)]
 
   # check all CNVs from step 3 are assigned
-  if (nrow(cnvs[st3 == 0 & st4 == 0,] != nrow(cnvs[st5 %in% c(1,0), ])))
+  if (!all(cnvs[st3 == 0 & st4 == 0, st5] %in% c(1,0)))
     stop("There is a problem in step 5")
   return(cnvs)
 }
