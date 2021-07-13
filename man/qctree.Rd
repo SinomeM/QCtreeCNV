@@ -28,6 +28,49 @@ qctree(
   clean_out = T
 )
 }
+\arguments{
+\item{cnvs}{lorem ipsum}
+
+\item{cnvrs}{lorem ipsum}
+
+\item{qsdt}{lorem ipsum}
+
+\item{loci}{lorem ipsum}
+
+\item{maxLRRSD}{lorem ipsum}
+
+\item{maxBAFdrift}{lorem ipsum}
+
+\item{maxGCWF}{lorem ipsum}
+
+\item{minGCWF}{lorem ipsum}
+
+\item{commonCNVRsMinFreq}{lorem ipsum}
+
+\item{st4minlogr1}{lorem ipsum}
+
+\item{st4maxlogr1}{lorem ipsum}
+
+\item{st4maxBAFcDEL}{lorem ipsum}
+
+\item{st4maxBAFcDUP}{lorem ipsum}
+
+\item{st4maxBAFbDEL}{lorem ipsum}
+
+\item{st4maxBAFbDUP}{lorem ipsum}
+
+\item{st5maxLRRSDlocus}{lorem ipsum}
+
+\item{st5maxBAFcDEL}{lorem ipsum}
+
+\item{st5maxBAFcDUP}{lorem ipsum}
+
+\item{st5maxBAFbDEL}{lorem ipsum}
+
+\item{st5maxBAFbDUP}{lorem ipsum}
+
+\item{clean_out}{lorem ipsum}
+}
 \description{
 The main functions of the \code{QCtreeCNV} package
 }

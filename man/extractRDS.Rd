@@ -6,6 +6,13 @@
 \usage{
 extractRDS(loci, samples_file, rds_path)
 }
+\arguments{
+\item{loci}{lorem ipsum}
+
+\item{samples_file}{lorem ipsum}
+
+\item{rds_path}{lorem ipsum}
+}
 \description{
 \code{extractRDS()} extract the raw LRR and BAF values in the loci from
 the intensity files.

@@ -2,6 +2,28 @@
 #'
 #' The main functions of the \code{QCtreeCNV} package
 #'
+#' @param cnvs lorem ipsum
+#' @param cnvrs lorem ipsum
+#' @param qsdt lorem ipsum
+#' @param loci lorem ipsum
+#' @param maxLRRSD lorem ipsum
+#' @param maxBAFdrift lorem ipsum
+#' @param maxGCWF lorem ipsum
+#' @param minGCWF lorem ipsum
+#' @param commonCNVRsMinFreq lorem ipsum
+#' @param st4minlogr1 lorem ipsum
+#' @param st4maxlogr1 lorem ipsum
+#' @param st4maxBAFcDEL lorem ipsum
+#' @param st4maxBAFcDUP lorem ipsum
+#' @param st4maxBAFbDEL lorem ipsum
+#' @param st4maxBAFbDUP lorem ipsum
+#' @param st5maxLRRSDlocus lorem ipsum
+#' @param st5maxBAFcDEL lorem ipsum
+#' @param st5maxBAFcDUP lorem ipsum
+#' @param st5maxBAFbDEL lorem ipsum
+#' @param st5maxBAFbDUP lorem ipsum
+#' @param clean_out lorem ipsum
+#'
 #' @export
 #'
 #' @import data.table

@@ -4,6 +4,10 @@
 #' \code{extractRDS()} extract the raw LRR and BAF values in the loci from
 #' the intensity files.
 #'
+#' @param loci lorem ipsum
+#' @param samples_file lorem ipsum
+#' @param rds_path lorem ipsum
+#'
 #' @export
 #'
 #' @import data.table

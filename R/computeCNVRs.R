@@ -1,28 +1,29 @@
-# Compute Copy Number Variable Regions (CNVRs)
-#
-# \code{cnvrs_create} compute CNVRs on a \code{CNVResutls} object, typically the
-# output of \code{\link{inter_res_merge}}.
-#
-# Copy Number Variable Regions (CNVRs) are defined as groups of reciprocal overlapping
-# CNVs. This function first try to assign every call to a CNVR (or create a new
-# one if it is not possible), then check if adjacent CNVRs cam be merged, and
-# finally recheck all the CNVs in each CNVRs and un-assign them if the reciprocal
-# overlap is no longer fulfilled with all the member of the CNVR. If any event
-# is touched by this last step, a new cycle begins, this until no more CNVs can
-# be removed from the assigned CNVR.
-#
-# @param cnvs a \code{CNVresults} produced by \code{\link{read_results}}.
-# @param chr_arms a \code{data.table} containing chromosomal arms locations. They
-#   are bundled in the package for hg18, hg19 and hg38 (\code{hgXX_chr_arms}).
-# @param prop reciprocal overlap proportion, default 0.3 (30\%).
-#
-# @return a \code{list} of two elements. The first element is a \code{data.table}
-#   that contains the actual CNVR information, genomic location and frequency in
-#   the cohort. The second element is the \code{CNVresults}
-#
-# @export
-#
-# @import data.table
+#' Compute Copy Number Variable Regions (CNVRs)
+#'
+#' \code{cnvrs_create} compute CNVRs on a \code{CNVResutls} object, typically the
+#' output of \code{\link{inter_res_merge}}.
+#'
+#' Copy Number Variable Regions (CNVRs) are defined as groups of reciprocal overlapping
+#' CNVs. This function first try to assign every call to a CNVR (or create a new
+#' one if it is not possible), then check if adjacent CNVRs cam be merged, and
+#' finally recheck all the CNVs in each CNVRs and un-assign them if the reciprocal
+#' overlap is no longer fulfilled with all the member of the CNVR. If any event
+#' is touched by this last step, a new cycle begins, this until no more CNVs can
+#' be removed from the assigned CNVR.
+#'
+#' @param cnvs a \code{CNVresults} produced by \code{\link{read_results}}.
+#' @param chr_arms a \code{data.table} containing chromosomal arms locations. They
+#'   are bundled in the package for hg18, hg19 and hg38 (\code{hgXX_chr_arms}).
+#' @param prop reciprocal overlap proportion, default 0.3 (30\%).
+#' @param final_merge lorem ipsum
+#'
+#' @return a \code{list} of two elements. The first element is a \code{data.table}
+#'   that contains the actual CNVR information, genomic location and frequency in
+#'   the cohort. The second element is the \code{CNVresults}
+#'
+#' @export
+#'
+#' @import data.table
 
 
 ## TODO!

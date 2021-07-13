@@ -4,6 +4,12 @@
 #' \code{extractMetrics()} extract the QC metrics from the raw data in RDS
 #' format.
 #'
+#' @param loci lorem ipsum
+#' @param cnvs lorem ipsum
+#' @param pennQC lorem ipsum
+#' @param int_rds_path lorem ipsum
+#' @param tmp_rds_path lorem ipsum
+#'
 #' @export
 #'
 #' @import data.table
