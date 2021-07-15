@@ -27,6 +27,7 @@ test_that("getline_locus internal function" , {
             expect_equal(as.numeric(ln4[6]), 1050)
 })
 
+
 # getline_cnv() #
 
 
@@ -34,8 +35,35 @@ test_that("getline_locus internal function" , {
 
 
 # chr_uniform() #
+# this should take care of column name and content (whitespace included)
+test_that("chr_uniform() works fine", {
+
+            dt <- QCtreeCNV:::chr_uniform(data.table(Chr = "chr1"))
+            expect_equal(colnames(dt), "chr")
+            expect_equal(dt$chr, "1")
+
+            dt <- QCtreeCNV:::chr_uniform(data.table(Chromosome = "Chr 1"))
+            expect_equal(colnames(dt), "chr")
+            expect_equal(dt$chr, "1")
+
+            dt <- QCtreeCNV:::chr_uniform(data.table(chromosome = " chr 11"))
+            expect_equal(colnames(dt), "chr")
+            expect_equal(dt$chr, "11")
+
+            dt <- QCtreeCNV:::chr_uniform(data.table(chr = "chrX"))
+            expect_equal(colnames(dt), "chr")
+            expect_equal(dt$chr, "23")
+
+            dt <- QCtreeCNV:::chr_uniform(data.table(chr = "chry"))
+            expect_equal(colnames(dt), "chr")
+            expect_equal(dt$chr, "24")
+})
+
 
 
 # uniform_GT_CN() #
-
+# this should take care of CN column name and content, plus create columns GT
+test_that("uniform_GT_CN() works fine", {
+            #
+})
 

@@ -140,16 +140,18 @@ uniform_GT_CN <- function(DT_in) {
 
 # return sample_ID, locus, GT and CN as a vector of <chr>
 # data.table is smart enough to convert the values back to
-# <int> when needed (of GT and CN)
+# <int> when needed (GT, CN, st/en etc.)
 
 getline_cnv <- function(cnv) {
+  if (!"CNVR_ID" %in% colnames(cnv)) stop("CNVR_ID column is missing")
+
   st <- cnv$start
   en <- cnv$end
   if ("length" %in% colnames(cnv)) l <- cnv$length
   else l <- en - st + 1
   cen <- st + l/2
-  myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, cnv$CNVR_ID,
-              st, en, l, cen)
+  #           1              2          3       4       5            6   7   8  9
+  myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, cnv$CNVR_ID, st, en, l, cen)
   return(myline)
 }
 
@@ -157,7 +159,13 @@ getline_cnv <- function(cnv) {
 # return start end and freq
 
 getline_cnvr <- function(cnvr) {
-  myline <- c(cnvr$start, cnvr$end, cnvr$freq)
+  st <- cnvr$start
+  en <- cnvr$end
+  if ("length" %in% colnames(cnvr)) l <- cnvr$length
+  else l <- en - st + 1
+  cen <- st + l/2
+  #           1   2   3          4         5             6  7
+  myline <- c(st, en, cnvr$freq, cnvr$chr, cnvr$CNVR_ID, l, cen)
   return(myline)
 }
 
@@ -168,6 +176,7 @@ getline_locus <- function(locus) {
   if ("length" %in% colnames(locus)) l <- locus$length
   else l <- en - st + 1
   cen <- st + l/2
+  #           1            2          3   4   5  6
   myline <- c(locus$locus, locus$chr, st, en, l, cen)
   return(myline)
 }
