@@ -171,7 +171,7 @@ cnvrs_create <- function(cnvs, chr_arms, prop = 0.3, final_merge = T) {
 
   # Merge overlapping CNVRs regardless of the CNVs contained
   if (final_merge) {
-    meassage("Merging 75% overlapping CNVRs regardless of the CNVs")
+    message("Merging 75% overlapping CNVRs regardless of the CNVs")
     tmp <- merge75(cnvrs, res)
     cnvrs <- tmp[[1]]
     res <- tmp[[2]]
