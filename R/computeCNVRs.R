@@ -239,7 +239,7 @@ merge_cnvrs <- function(cnvrs, DT, n, prop, arm, reg_arm) {
 
   for (i in 1:nrow(cnvrs)) {
     b <- FALSE
-    my_reg <- get_region_with_rID(cnvrs[i], prop)
+    my_reg <- get_region_with_CNVR_ID(cnvrs[i], prop)
     # search compatible cnvrs
     #     cnvrs_m <-
     #       cnvrs[start <= my_reg[[1]][3] & end >= my_reg[[1]][2], ]
@@ -254,7 +254,7 @@ merge_cnvrs <- function(cnvrs, DT, n, prop, arm, reg_arm) {
     # in any case there will be at least another loop
     for (ii in 1:nrow(cnvrs_m)) {
 
-      my_reg_m <- get_region_with_rID(cnvrs_m[ii], prop)
+      my_reg_m <- get_region_with_CNVR_ID(cnvrs_m[ii], prop)
       overl <-
         min(my_reg[[1]][3], my_reg_m[[1]][3]) - max(my_reg[[1]][2], my_reg_m[[1]][2])
 
@@ -283,7 +283,7 @@ dupl_cnvrs <- function(cnvrs, DT) {
 
   for (i in 1:nrow(cnvrs)) {
     b <- FALSE
-    my_reg <- get_region_with_rID(cnvrs[i])
+    my_reg <- get_region_with_CNVR_ID(cnvrs[i])
     # search compatible cnvrs
     cnvrs_m <- cnvrs[chr == my_reg[[1]][1] & CNVR_ID != my_reg[[2]] &
                      start == my_reg[[1]][2] & end == my_reg[[1]][3], ]
@@ -305,7 +305,7 @@ check_cnvrs <- function(cnvrs, DT, n, prop, arm, reg_arm) {
 
   for (i in 1:nrow(cnvrs)) {
     b <- FALSE
-    my_reg <- get_region_with_rID(cnvrs[i], prop)
+    my_reg <- get_region_with_CNVR_ID(cnvrs[i], prop)
     # search compatible cnvrs
     cnvrs_m <-
       cnvrs[between(start, my_reg[[1]][2], my_reg[[1]][3], incbounds = FALSE) |
@@ -319,7 +319,7 @@ check_cnvrs <- function(cnvrs, DT, n, prop, arm, reg_arm) {
     # if there is a match, check the relative cnvs
     for (ii in 1:nrow(cnvrs_m)) {
 
-      my_reg_m <- get_region_with_rID(cnvrs_m[ii], prop)
+      my_reg_m <- get_region_with_CNVR_ID(cnvrs_m[ii], prop)
       overl <-
         min(my_reg[[1]][3], my_reg_m[[1]][3]) - max(my_reg[[1]][2], my_reg_m[[1]][2])
       pass_check <- TRUE

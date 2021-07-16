@@ -16,7 +16,7 @@ get_region <- function(my_line, prop = 1) {
 
 # -----------------------------------------------------------------------------
 
-get_region_with_rID <- function(my_line, prop = 1) {
+get_region_with_CNVR_ID <- function(my_line, prop = 1) {
   # same as get_region but returns also r_ID if present, in that case reg is a
   # list of vectors, in this way reg[[1]] remain a numeric vector
   chr <- as.integer(my_line$chr)
@@ -25,9 +25,9 @@ get_region_with_rID <- function(my_line, prop = 1) {
   len <- (en - st +1) * prop
   reg <- c(chr, st, en, len)
 
-  # attach also r_ID if present
-  if ("r_ID" %in% colnames(my_line))
-    reg <- list(reg, my_line$r_ID)
+  # attach also CNVR_ID if present
+  if ("CNVR_ID" %in% colnames(my_line))
+    reg <- list(reg, my_line$CNVR_ID)
 
   return(reg)
 }
@@ -41,9 +41,9 @@ get_regions_list <- function(my_lines, prop = 1) {
   en <- as.integer(my_lines$end)
   len <- (en - st +1) * prop
 
-  # list of list when R_ID or cnvrs information are present (character/numeric)
-  if ("r_ID" %in% colnames(my_lines))
-    reg <- list(chr, st, en, len, my_lines$r_ID)
+  # list of list when CNVR_ID or cnvrs information are present (character/numeric)
+  if ("CNVR_ID" %in% colnames(my_lines))
+    reg <- list(chr, st, en, len, my_lines$CNVR_ID)
   else if ("cnvr" %in% colnames(my_lines))
       reg <- list(chr, st, en, len, my_lines$cnvr)
   else
