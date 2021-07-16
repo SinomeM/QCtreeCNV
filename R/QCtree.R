@@ -89,7 +89,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   ### STEP 2 & 3 CNVRs ###
   message("# -------------------------- #\n",
           "Steps 2 and 3, CNVRs")
-  cnvrs_groups <- sortCNVRs(cnvs, cnvrs, loci, commonCNVRsMinFreq)
+  cnvrs_groups <- sortCNVRs(cnvs, loci, cnvrs, commonCNVRsMinFreq)
 
   # STEP 2
   cnvsOUT <- step2(cnvsOUT, cnvrs_groups)
