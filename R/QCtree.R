@@ -264,10 +264,11 @@ sortCNVRs <- function(cnvs, loci, cnvrs, minFreq) {
                     as.integer(pmax(start,loc_line[3])) + 1) /
                       as.integer(loc_line[5])]
 
-    cnvrsA <- c(cnvrsA, lcnvrs[freq <= th1 & op >= 0.75, CNVR_ID])
+    cnvrsA <- c(cnvrsA, lcnvrs[freq <= th1 | op >= 0.75, CNVR_ID])
     # the user should be able to change these values
     cnvrsB <- c(cnvrsB, lcnvrs[freq >= th5 & op <= 0.55, CNVR_ID])
     cnvrsC <- c(cnvrsC, lcnvrs[!CNVR_ID %in% c(cnvrsA, cnvrsB), CNVR_ID])
   }
+  print(cnvrs[!CNVR_ID %in% c(cnvrsA, cnvrsB, cnvrsC), ])
   return(list(cnvrsA, cnvrsB, cnvrsC))
 }
