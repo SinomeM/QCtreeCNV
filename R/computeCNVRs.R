@@ -422,7 +422,7 @@ merge75 <- function(cnvrs, cnvs) {
       newline[,`:=` (start = nst, end = nsp, freq = nfr)]
       cnvrs_edit <- rbind(cnvrs_edit[!CNVR_ID %in% comp,], newline)
       # update also CNVs
-      cnvs[cnvrs %in% comp, cnvrs := comp[1]]
+      cnvs[CNVR_ID %in% comp, cnvrs := comp[1]]
     }
     if (cnvrs[, sum(freq)] != cnvrs_edit[, sum(freq)]) {
       message("Ouch!")
