@@ -50,7 +50,7 @@ cnvrs_create <- function(cnvs, chr_arms, prop = 0.3, final_merge = T) {
 
   # cnvrs: arm_ID, chr, start, end
   # this create a line with all "NA", I remove it later
-  cnvrs <- data.table("r_ID" = NA_character_, "chr" = NA_character_,
+  cnvrs <- data.table("CNVR_ID" = NA_character_, "chr" = NA_character_,
                       "start" = NA_integer_, "end" = NA_integer_)
   res <- data.table()
 
@@ -59,7 +59,7 @@ cnvrs_create <- function(cnvs, chr_arms, prop = 0.3, final_merge = T) {
     message("\n-- Computing CNVRs in chromosome arm:", arm, "--\n")
 
     # cnvrs for this arm
-    cnvrs_tmp <- data.table("r_ID" = NA_character_, "chr" = NA_character_,
+    cnvrs_tmp <- data.table("CNVR_ID" = NA_character_, "chr" = NA_character_,
                             "start" = NA_integer_, "end" = NA_integer_)
     # arm related variables
     reg_arm <- get_region(chr_arms[arm_ID == arm,])
@@ -87,7 +87,7 @@ cnvrs_create <- function(cnvs, chr_arms, prop = 0.3, final_merge = T) {
       tmp <- create_fill_CNVR(cnvrs_tmp, DT, n, prop, indexes, arm, reg_arm)
       DT <- tmp[[2]]
       cnvrs_tmp <- tmp[[1]]
-      cnvrs_tmp <- cnvrs_tmp[!is.na(r_ID) & r_ID %in% DT$cnvr, ]
+      cnvrs_tmp <- cnvrs_tmp[!is.na(CNVR_ID) & CNVR_ID %in% DT$cnvr, ]
       n <- tmp[[3]]
 
 
@@ -138,7 +138,7 @@ cnvrs_create <- function(cnvs, chr_arms, prop = 0.3, final_merge = T) {
       if (n_loop < 50) DT <- remove_cnvs(DT, prop)
 
       # remove CNVRs if necessary
-      cnvrs_tmp <- cnvrs_tmp[r_ID %in% unique(DT$cnvr), ]
+      cnvrs_tmp <- cnvrs_tmp[CNVR_ID %in% unique(DT$cnvr), ]
 
       n_loop <- n_loop + 1
     }
@@ -164,10 +164,10 @@ cnvrs_create <- function(cnvs, chr_arms, prop = 0.3, final_merge = T) {
   }
 
   # CNVRs can no longer have CNVs, clean those ones
-  cnvrs <- cnvrs[r_ID %in% unique(res$cnvr), ]
+  cnvrs <- cnvrs[CNVR_ID %in% unique(res$cnvr), ]
   # count the final CNVs frequency per CNVRs
   freqs <- res[, .N, by = cnvr]
-  cnvrs[, freq := freqs[match(cnvrs$r_ID, freqs$cnvr), N]]
+  cnvrs[, freq := freqs[match(cnvrs$CNVR_ID, freqs$cnvr), N]]
 
   # Merge overlapping CNVRs regardless of the CNVs contained
   if (final_merge) {
@@ -189,16 +189,16 @@ create_fill_CNVR <- function(cnvrs, DT, n, prop, ixs, arm, reg_arm) {
     bb <- FALSE
     my_reg <- get_region(DT[ix == i, ], prop)
     # possible cnvrs
-    if (nrow(cnvrs[!is.na(r_ID), ]) != 0) {
-      cnvr_m <- cnvrs[!is.na(r_ID),][
+    if (nrow(cnvrs[!is.na(CNVR_ID), ]) != 0) {
+      cnvr_m <- cnvrs[!is.na(CNVR_ID),][
         between(start, my_reg[2], my_reg[3], incbounds = TRUE) |
           between(end, my_reg[2], my_reg[3], incbounds = TRUE), ]
     } # this if else is needed for the initial CNVR (of each chr)
-    else cnvr_m <- cnvrs[!is.na(r_ID), ]
+    else cnvr_m <- cnvrs[!is.na(CNVR_ID), ]
 
     # no match, initialize new cnvr
     if (nrow(cnvr_m) == 0) {
-      cnvrs <- rbind(cnvrs, data.table("r_ID" = paste0(arm, "-", n),
+      cnvrs <- rbind(cnvrs, data.table("CNVR_ID" = paste0(arm, "-", n),
                                        "chr" = reg_arm[1], "start" = my_reg[2],
                                        "end" = my_reg[3]))
       DT$cnvr[i] <- paste0(arm, "-", n)
@@ -206,7 +206,7 @@ create_fill_CNVR <- function(cnvrs, DT, n, prop, ixs, arm, reg_arm) {
     }
     # at least one cnvr overlap with cnv under examination
     else {
-      for (r in cnvr_m$r_ID) {
+      for (r in cnvr_m$CNVR_ID) {
         reg_list <- get_regions_list(DT[cnvr == r, ], prop)
         overlaps <- pmin(my_reg[3], reg_list[[3]]) - pmax(my_reg[2], reg_list[[2]]) + 1
         # reciprocal overlaps
@@ -215,7 +215,7 @@ create_fill_CNVR <- function(cnvrs, DT, n, prop, ixs, arm, reg_arm) {
             all(sapply(overlaps, function(x) x >= reg_list[[4]]))) {
           DT$cnvr[i] <- r
           # update cnvrs boundaries
-          cnvrs[r_ID == r, `:=` (start = min(start, my_reg[2]), end = max(end, my_reg[3]))]
+          cnvrs[CNVR_ID == r, `:=` (start = min(start, my_reg[2]), end = max(end, my_reg[3]))]
           bb <- TRUE
         }
       if (bb) break
@@ -223,7 +223,7 @@ create_fill_CNVR <- function(cnvrs, DT, n, prop, ixs, arm, reg_arm) {
 
       # cnvr not set mean no match with candidates cnvrs
       if (!bb) {
-        cnvrs <- rbind(cnvrs, data.table("r_ID" = paste0(arm, "-", n),
+        cnvrs <- rbind(cnvrs, data.table("CNVR_ID" = paste0(arm, "-", n),
                                          "chr" = reg_arm[1], "start" = my_reg[2],
                                          "end" = my_reg[3]))
         DT$cnvr[i] <- paste0(arm, "-", n)
@@ -262,10 +262,10 @@ merge_cnvrs <- function(cnvrs, DT, n, prop, arm, reg_arm) {
 
         # if two CNVRs have the desired overlap, update CNVR, remove the old ones and update DT
         cnvrs <- rbind(cnvrs,
-                       data.table("r_ID" = paste0(arm, "-", n), "chr" = reg_arm[1],
+                       data.table("CNVR_ID" = paste0(arm, "-", n), "chr" = reg_arm[1],
                                   "start" = min(my_reg[[1]][2], my_reg_m[[1]][2]),
                                   "end" = max(my_reg[[1]][3], my_reg_m[[1]][3])))
-        cnvrs <- cnvrs[!r_ID %in% c(my_reg[[2]], my_reg_m[[2]])]
+        cnvrs <- cnvrs[!CNVR_ID %in% c(my_reg[[2]], my_reg_m[[2]])]
         DT[cnvr %in% c(my_reg[[2]], my_reg_m[[2]]), cnvr := paste0(arm, "-", n)]
         n <- n + 1
         message("CNVR updated")
@@ -285,15 +285,15 @@ dupl_cnvrs <- function(cnvrs, DT) {
     b <- FALSE
     my_reg <- get_region_with_rID(cnvrs[i])
     # search compatible cnvrs
-    cnvrs_m <- cnvrs[chr == my_reg[[1]][1] & r_ID != my_reg[[2]] &
+    cnvrs_m <- cnvrs[chr == my_reg[[1]][1] & CNVR_ID != my_reg[[2]] &
                      start == my_reg[[1]][2] & end == my_reg[[1]][3], ]
 
     # if there are no hits skip
     if (nrow(cnvrs_m) == 0 ) next
 
     # if there is a match, the CNVRs can be combined
-    cnvrs <- cnvrs[!r_ID %in% cnvrs_m$r_ID,]
-    DT[cnvr %in% cnvrs_m$r_ID, cnvr := my_reg[[2]]]
+    cnvrs <- cnvrs[!CNVR_ID %in% cnvrs_m$CNVR_ID,]
+    DT[cnvr %in% cnvrs_m$CNVR_ID, cnvr := my_reg[[2]]]
     message("CNVRs updated")
     b <- TRUE
     break
@@ -346,10 +346,10 @@ check_cnvrs <- function(cnvrs, DT, n, prop, arm, reg_arm) {
           # if all cnvs are compatible, update CNVR, remove the old ones and update DT
           nnew <- paste0(arm, "-", n)
           cnvrs <- rbind(cnvrs,
-                         data.table("r_ID" = nnew, "chr" = reg_arm[1],
+                         data.table("CNVR_ID" = nnew, "chr" = reg_arm[1],
                                     "start" = min(my_reg[[1]][2], my_reg_m[[1]][2]),
                                     "end" = max(my_reg[[1]][3], my_reg_m[[1]][3])))
-          cnvrs <- cnvrs[!r_ID %in% c(my_reg[[2]], my_reg_m[[2]]),]
+          cnvrs <- cnvrs[!CNVR_ID %in% c(my_reg[[2]], my_reg_m[[2]]),]
           DT[cnvr %in% c(my_reg[[2]], my_reg_m[[2]]), cnvr := nnew]
           n <- n + 1
           message("CNVR updated")
