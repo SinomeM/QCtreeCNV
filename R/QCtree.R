@@ -260,8 +260,8 @@ sortCNVRs <- function(cnvs, loci, cnvrs, minFreq) {
     lcnvrs <- cnvrs[chr == loc_line[2] &
                     start <= loc_line[4] & end >= loc_line[3], ]
     # compute overlap prop
-    lcnvrs[, op := (as.integer(pmax(start,loc_line[3])) -
-                    pmin(end,as.integer(loc_line[4])) + 1) /
+    lcnvrs[, op := (as.integer(pmin(end,loc_line[4])) -
+                    as.integer(pmax(start,loc_line[3])) + 1) /
                       as.integer(loc_line[5])]
 
     cnvrsA <- c(cnvrsA, lcnvrs[freq <= th1 & op >= 0.75, CVNR_ID])
