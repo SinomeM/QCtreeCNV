@@ -19,8 +19,7 @@ qctree(
   st4maxBAFcDEL = 0.03,
   st4maxBAFcDUP = 0.125,
   st4maxBAFbDEL = 0.075,
-  st4maxBAFbDUP = NA,
-  st5maxLRRSDlocus,
+  st5maxLRRSDlocus = 0.35,
   st5maxBAFcDEL = 0.05,
   st5maxBAFcDUP = 0.15,
   st5maxBAFbDEL = 0.1,
@@ -56,8 +55,6 @@ qctree(
 \item{st4maxBAFcDUP}{lorem ipsum}
 
 \item{st4maxBAFbDEL}{lorem ipsum}
-
-\item{st4maxBAFbDUP}{lorem ipsum}
 
 \item{st5maxLRRSDlocus}{lorem ipsum}
 

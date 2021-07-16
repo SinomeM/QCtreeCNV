@@ -16,7 +16,6 @@
 #' @param st4maxBAFcDEL lorem ipsum
 #' @param st4maxBAFcDUP lorem ipsum
 #' @param st4maxBAFbDEL lorem ipsum
-#' @param st4maxBAFbDUP lorem ipsum
 #' @param st5maxLRRSDlocus lorem ipsum
 #' @param st5maxBAFcDEL lorem ipsum
 #' @param st5maxBAFcDUP lorem ipsum
@@ -55,11 +54,9 @@
 qctree <- function(cnvs, cnvrs, qsdt, loci,
                    maxLRRSD=.3, maxBAFdrift=.01,maxGCWF=.015, minGCWF=-.015,
                    commonCNVRsMinFreq = NA,
-                   st4minlogr1=-.35,st4maxlogr1=.4,
-                   st4maxBAFcDEL=.03, st4maxBAFcDUP=.125,
-                   st4maxBAFbDEL=0.075, st4maxBAFbDUP=NA,
-                   st5maxLRRSDlocus,
-                   st5maxBAFcDEL=.05, st5maxBAFcDUP=.15,
+                   st4minlogr1=-.35,st4maxlogr1=.4, st4maxBAFcDEL=.03,
+                   st4maxBAFcDUP=.125, st4maxBAFbDEL=0.075,
+                   st5maxLRRSDlocus=0.35, st5maxBAFcDEL=.05, st5maxBAFcDUP=.15,
                    st5maxBAFbDEL=.1, st5maxBAFbDUP=NA,
                    clean_out = T) {
 
@@ -212,7 +209,11 @@ step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
   cnvs[GT == 2 & st3 == 0 & st4 == 0 & LRRSDlocus > maxlrrsd &
           BAFc <= maxbafcdup, `:=` (st5 = 1, excl = 1)]
 
-  cnvs[GT == 1 & st3 == 0 & st4 == 0 & st5 == -1, `:=` (st5 = 0, excl = 0)]
+  # LRRSDlocus extremely high
+  cnvs[st3 == 0 & st4 == 0 & LRRSDlocus > 0.55, `:=` (st5 = 1, excl = 1)]
+
+  # all the other
+  cnvs[st3 == 0 & st4 == 0 & st5 == -1, `:=` (st5 = 0, excl = 0)]
 
   # check all CNVs from step 3 are assigned
   if (!all(cnvs[st3 == 0 & st4 == 0, st5] %in% c(1,0)))
