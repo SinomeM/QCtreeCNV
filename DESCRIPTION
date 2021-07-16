@@ -1,6 +1,6 @@
 Package: QCtreeCNV
 Title: Reducing the visual inspection effort in CNV calling
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: 
     person(given = "Simone",
            family = "Montalbano",
