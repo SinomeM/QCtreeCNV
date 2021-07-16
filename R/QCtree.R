@@ -69,8 +69,8 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
           "Step 0, pre-process")
 
   # add qs measures, i.e. merge the two tables
-  setkey(cnvs, c("sample_ID", "locus"))
-  setkey(qsdt, c("sample_ID", "locus"))
+  setkeyv(cnvs, c("sample_ID", "locus"))
+  setkeyv(qsdt, c("sample_ID", "locus"))
   # join tables using data.table keys
   cnvsOUT <- cnvs[qsdt]
   # add excl column to keep track of the process
