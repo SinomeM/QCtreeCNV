@@ -259,10 +259,11 @@ sortCNVRs <- function(cnvs, loci, cnvrs, minFreq) {
     # CNVRs that can give problems are the very large ones, that
     # would be saved anyway
     lcnvrs <- cnvrs[chr == loc_line[2] &
-                    start <= loc_line[4] & end >= loc_line[3], ]
+                    start <= as.integer(loc_line[4]) &
+                    end >= as.integer(loc_line[3]), ]
     # compute overlap prop
-    lcnvrs[, op := (as.integer(pmin(end,loc_line[4])) -
-                    as.integer(pmax(start,loc_line[3])) + 1) /
+    lcnvrs[, op := (pmin(end,as.integer(loc_line[4])) -
+                    pmax(start,as.integer(loc_line[3]))) + 1) /
                       as.integer(loc_line[5])]
 
     cnvrsA <- c(cnvrsA, lcnvrs[freq <= th1 | op >= 0.75, CNVR_ID])
