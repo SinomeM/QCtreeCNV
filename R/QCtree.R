@@ -124,7 +124,8 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   if (clean_out) cnvsOUT[, c("st1", "st2", "st3", "st4", "st5") := NULL]
 
   # return good and excluded as a list
-  return(list(cnvsOUT[excl == 0, ], cnvsOUT[excl == 1, ]))
+  return(cnvsOUT)
+  #   return(list(cnvsOUT[excl == 0, ], cnvsOUT[excl == 1, ]))
 }
 
 
