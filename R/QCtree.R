@@ -184,7 +184,7 @@ step4 <- function(cnvs, minlogr1, maxlogr1, maxbafcdel, maxbafcdup, maxbafbdel) 
   cnvs[st3 == 1 & GT == 2 & st4 == -1, `:=` (st4 = 1, excl = 1)]
 
   # check all CNVs from step 3 are assigned
-  if (nrow(cnvs[st3 == 0,] != nrow(cnvs[st4 %in% c(1,0), ])))
+  if (!all(cnvs[st3 == 1, st4] %in% c(1,0)))
     stop("There is a problem in step 4")
   return(cnvs)
 }
