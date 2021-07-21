@@ -194,27 +194,27 @@ step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
                   maxbafcdel, maxbafcdup, maxbafbdel,
                   maxbafcdel2, maxbafbdel2) {
   cnvs[, st5 := -1]
-  # Takes calls from st3 = 0 and st4 = 0
+  # Takes calls from st3 = 0 or st4 = 0
 
   # mLRRlocus particularly out
-  cnvs[GT == 1 & st3 == 0 & st4 == 0 & mLRRlocus > maxmLRRdel, `:=` (st5 = 1, excl = 1)]
-  cnvs[GT == 2 & st3 == 0 & st4 == 0 & mLRRlocus < minmLRRdup, `:=` (st5 = 1, excl = 1)]
+  cnvs[(st3 == 0 | st4 == 0) & GT == 1 & mLRRlocus > maxmLRRdel, `:=` (st5 = 1, excl = 1)]
+  cnvs[(st3 == 0 | st4 == 0) & GT == 2 & mLRRlocus < minmLRRdup, `:=` (st5 = 1, excl = 1)]
 
   # In calls with high LRRSDlocus, check BAFc and BAFb, if at least one of them
   # well out of range or both with lower thresholds then it's excluded
   # Deletions
-  cnvs[GT == 1 & st3 == 0 & st4 == 0 & LRRSDlocus > maxlrrsd &
+  cnvs[(st3 == 0 | st4 == 0) & GT == 1 & LRRSDlocus > maxlrrsd &
           ((BAFc <= maxbafcdel | BAFb <= maxbafbdel) |
            (BAFc <= maxbafcdel2 & BAFb <= maxbafbdel2)), `:=` (st5 = 1, excl = 1)]
   # Duplications
-  cnvs[GT == 2 & st3 == 0 & st4 == 0 & LRRSDlocus > maxlrrsd &
+  cnvs[(st3 == 0 | st4 == 0) & GT == 2 & LRRSDlocus > maxlrrsd &
           BAFc <= maxbafcdup, `:=` (st5 = 1, excl = 1)]
 
   # LRRSDlocus extremely high
-  cnvs[st3 == 0 & st4 == 0 & LRRSDlocus > 0.55, `:=` (st5 = 1, excl = 1)]
+  cnvs[(st3 == 0 | st4 == 0) & LRRSDlocus > 0.55, `:=` (st5 = 1, excl = 1)]
 
   # all the other
-  cnvs[st3 == 0 & st4 == 0 & st5 == -1, `:=` (st5 = 0, excl = 0)]
+  cnvs[(st3 == 0 | st4 == 0) & st5 == -1, `:=` (st5 = 0, excl = 0)]
 
   # check all CNVs from step 3 are assigned
   if (!all(cnvs[st3 == 0 & st4 == 0, st5] %in% c(1,0)))
