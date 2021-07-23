@@ -25,7 +25,7 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
       k <- j+1
 
       if (lcnvs$sample[j] == lcnvs$sample[k] & lcnvs$type[j] == lcnvs$type[k]) {
-        ggap <- (lcnv[k, start] - lcnvs[j, stop]) / (lcnvs[k, stop] - lcnvs[j, start])
+        ggap <- (lcnvs[k, start] - lcnvs[j, stop]) / (lcnvs[k, stop] - lcnvs[j, start])
 
         if (ggap < maxgap) {
           lcnvs[k, `:=` (sticth = 1, gap = ggap, start = lcnvs[j, start],
