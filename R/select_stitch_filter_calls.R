@@ -21,7 +21,7 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
     while (tmpadd > 0) {
       inrows <- nrow(lcnvs)
 
-      for (j in 1:nrow(lcnvs)-1) {
+      for (j in 1:(nrow(lcnvs)-1)) {
       k <- j+1
 
       if (lcnvs$sample[j] == lcnvs$sample[k] & lcnvs$type[j] == lcnvs$type[k]) {
