@@ -45,12 +45,16 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
     }
     lcnvs[, remove := NULL]
 
-    # compute overlap
-    lcnvs[, overlap := (min(stop, lsp) - max(start, lst) + 1) / (lsp-lst+1)]
+    # compute overlap & add locus
+    lcnvs[, `:=` (overlap := (min(stop, lsp) - max(start, lst) + 1) / (lsp-lst+1),
+                  locus = lloc)]
     lcnvs[overlap >= minoverlap]
 
     if (nrow(lcnvs) > 0) {
-      if (l == 1) cnvsOUT <- lcnvs
+      if (l == 1) {
+        cnvsOUT <- lcnvs
+        l <- 2
+        }
       else cnvsOUT <- rbind(cnvsOUT, lcnvs)
     }
   }
