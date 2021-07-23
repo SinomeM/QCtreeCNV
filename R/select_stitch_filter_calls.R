@@ -31,7 +31,7 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
           lcnvs[k, `:=` (sticth = 1, gap = ggap, start = lcnvs[j, start],
                         length = stop - start + 1, numsnp = numsnp + lcnvs[j, numsnp],
                         densnp = round(length / numsnp, digits = 0))]
-          lcnvs[j, remove = T]
+          lcnvs[j, remove := T]
         }
       }
     }
