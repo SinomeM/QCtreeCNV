@@ -8,6 +8,7 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
     lchr <- loci$chr[i]
     lst <- loci$start[i]
     lsp <- loci$end[i]
+    message("Locus ", lloc)
 
     lcnvs <- cnvs[chr == lchr & start <= lsp &
                   stop >= lst & numsnp >= minsnp, ]
@@ -32,19 +33,16 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
                         length = stop - start + 1, numsnp = numsnp + lcnvs[j, numsnp],
                         densnp = round(length / numsnp, digits = 0))]
           lcnvs[j, remove := T]
+          }
         }
       }
-    }
-
       lcnvs <- lcnvs[remove == F,]
       outrows <- nrow(lcnvs)
       tmpadd <- inrows - outrows
-
       if (tmpadd > 0) message("round", tmpround)
       else message("done")
       tmpround <- tmpround+1
     }
-
     lcnvs[, remove := NULL]
 
     # compute overlap
@@ -55,7 +53,6 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
       if (l == 1) cnvsOUT <- lcnvs
       else cnvsOUT <- rbind(cnvsOUT, lcnvs)
     }
-
-    return(cnvsOUT)
   }
+  return(cnvsOUT)
 }
