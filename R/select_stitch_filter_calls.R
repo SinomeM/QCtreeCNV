@@ -12,8 +12,8 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
     lcnvs <- cnvs[chr == lchr & start <= lsp &
                   stop >= lst & numsnp >= minsnp, ]
     lcnvs[, densnp := round(length / numsnp , digits=0)]
-    setorder(lcnvs, c("sample", "type", "start"))
-    lcnvs[, `:=` (stitch = 0, remove = F, gap = NA_numeric_)]
+    setorderv(lcnvs, c("sample", "type", "start"))
+    lcnvs[, `:=` (stitch = 0, remove = F, gap = NA_real_)]
 
     tmpround <- 1
     tmpadd <- 1
