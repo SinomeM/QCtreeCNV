@@ -416,7 +416,7 @@ merge75 <- function(cnvrs, cnvs) {
     if (length(comp) >1) {
       if (nrow(cnvrs_edit[CNVR_ID %in% comp,]) < 2) next
       nst <- min(cnvrs_edit[CNVR_ID %in% comp, start])
-      nsp <- min(cnvrs_edit[CNVR_ID %in% comp, end])
+      nsp <- max(cnvrs_edit[CNVR_ID %in% comp, end])
       nfr <- sum(cnvrs_edit[CNVR_ID %in% comp, freq])
       newline <- cnvrs_edit[CNVR_ID == comp[1],]
       newline[,`:=` (start = nst, end = nsp, freq = nfr)]
