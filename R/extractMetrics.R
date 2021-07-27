@@ -16,8 +16,7 @@
 
 
 ## TODO!
-# 1. move here the code from the RMD file from GDK and standardize it
-# 2. minimal documentation, in particular on the input files!
+# 1. minimal documentation, in particular on the input files!
 
 extractMetrics <- function(loci, cnvs, pennQC, int_rds_path, tmp_rds_path) {
 
