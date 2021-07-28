@@ -1,5 +1,5 @@
 
-select_stich_calls <- function(cnvs, loci, minsnp = 20,
+select_stitch_calls <- function(cnvs, loci, minsnp = 20,
                                maxgap = 0.5, minoverlap = 0.2) {
   l <- 1
 
@@ -13,7 +13,7 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
     lcnvs <- cnvs[chr == lchr & start <= lsp &
                   stop >= lst & numsnp >= minsnp, ]
     lcnvs[, densnp := round(length / numsnp , digits=0)]
-    setorderv(lcnvs, c("sample", "type", "start"))
+    setorder(lcnvs, sample, type, start)
     lcnvs[, `:=` (stitch = 0, remove = F, gap = NA_real_)]
 
     tmpround <- 1
@@ -29,7 +29,7 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
         ggap <- (lcnvs[k, start] - lcnvs[j, stop]) / (lcnvs[k, stop] - lcnvs[j, start])
 
         if (ggap < maxgap) {
-          lcnvs[k, `:=` (sticth = 1, gap = ggap, start = lcnvs[j, start],
+          lcnvs[k, `:=` (stitch = 1, gap = ggap, start = lcnvs[j, start],
                         length = stop - start + 1, numsnp = numsnp + lcnvs[j, numsnp],
                         densnp = round(length / numsnp, digits = 0))]
           lcnvs[j, remove := T]
@@ -46,10 +46,12 @@ select_stich_calls <- function(cnvs, loci, minsnp = 20,
     lcnvs[, remove := NULL]
 
     # compute overlap & add locus
-    lcnvs[, `:=` (overlap = (min(stop, lsp) - max(start, lst) + 1) / (lsp-lst+1),
+    lcnvs[, `:=` (overlap = (pmin(stop, lsp) - pmax(start, lst) + 1) / (lsp-lst+1),
                   locus = lloc)]
     lcnvs[overlap >= minoverlap]
 
+    if (!"overlap" %in% colnames(lcnvs)) lcnvs$overlap <- NA_real_
+    
     if (nrow(lcnvs) > 0) {
       if (l == 1) {
         cnvsOUT <- lcnvs
