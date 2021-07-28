@@ -52,11 +52,12 @@
 # - step 1 (QC)
 # - step 4
 qctree <- function(cnvs, cnvrs, qsdt, loci,
-                   maxLRRSD=.3, maxBAFdrift=.01,maxGCWF=.015, minGCWF=-.015,
+                   maxLRRSD=.35, maxBAFdrift=.01,maxGCWF=.02, minGCWF=-.02,
                    commonCNVRsMinFreq = NA,
                    st4minlogr1=-.35,st4maxlogr1=.4, st4maxBAFcDEL=.03,
                    st4maxBAFcDUP=.125, st4maxBAFbDEL=0.075,
-                   st5maxLRRSDlocus=0.35, st5maxBAFcDEL=.05, st5maxBAFcDUP=.15,
+                   st5maxLRRSDlocus=0.35, st5maxlogr1=0.5,
+                   st5maxBAFcDEL=.05, st5maxBAFcDUP=.15,
                    st5maxBAFbDEL=.1, st5maxBAFbDUP=NA,
                    clean_out = T) {
 
@@ -111,7 +112,8 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
           "Step 5, LRRSD and mean LRR checks inside locus of interest\n",
           "plus logr1, BAFc & BAFb check for all calls")
   cnvsOUT <- step5(cnvsOUT, 0, -0.3, st5maxLRRSDlocus,
-                   st5maxBAFcDEL, st5maxBAFcDUP, st5maxBAFbDEL,
+                   st5maxlogr1, st5maxBAFcDEL,
+                   st5maxBAFcDUP, st5maxBAFbDEL,
                    st4maxBAFcDEL, st4maxBAFbDEL)
 
   ### RETURN ###
@@ -191,29 +193,38 @@ step4 <- function(cnvs, minlogr1, maxlogr1, maxbafcdel, maxbafcdup, maxbafbdel) 
 }
 
 step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
-                  maxbafcdel, maxbafcdup, maxbafbdel,
-                  maxbafcdel2, maxbafbdel2) {
+                  maxlogr1, maxbafcdel, maxbafcdup,
+                  maxbafbdel, maxbafcdel2, maxbafbdel2) {
   cnvs[, st5 := -1]
   # Takes calls from st3 = 0 or st4 = 0
 
-  # mLRRlocus particularly out
+  # 1. mLRRlocus particularly out
   cnvs[(st3 == 0 | st4 == 0) & GT == 1 & mLRRlocus > maxmLRRdel, `:=` (st5 = 1, excl = 1)]
   cnvs[(st3 == 0 | st4 == 0) & GT == 2 & mLRRlocus < minmLRRdup, `:=` (st5 = 1, excl = 1)]
 
-  # In calls with high LRRSDlocus, check BAFc and BAFb, if at least one of them
-  # well out of range or both with lower thresholds then it's excluded
-  # Deletions
+  # 2. In calls with high LRRSDlocus, check BAFc and BAFb, if at least one of them
+  #    well out of range or both with lower thresholds then it's excluded
+  #    Deletions
   cnvs[(st3 == 0 | st4 == 0) & GT == 1 & LRRSDlocus > maxlrrsd &
           ((BAFc <= maxbafcdel | BAFb <= maxbafbdel) |
            (BAFc <= maxbafcdel2 & BAFb <= maxbafbdel2)), `:=` (st5 = 1, excl = 1)]
-  # Duplications
+  #    Duplications
   cnvs[(st3 == 0 | st4 == 0) & GT == 2 & LRRSDlocus > maxlrrsd &
           BAFc <= maxbafcdup, `:=` (st5 = 1, excl = 1)]
 
-  # LRRSDlocus extremely high
+  # 3. LRRSDlocus extremely high
   cnvs[(st3 == 0 | st4 == 0) & LRRSDlocus > 0.55, `:=` (st5 = 1, excl = 1)]
 
-  # all the other
+  # 4. logr1 and BAFc | BAFb weel out
+  #    Deletions
+  cnvs[(st3 == 0 | st4 == 0) & GT == 1 & logr1 >= maxlogr1 &
+          ((BAFc <= maxbafcdel | BAFb <= maxbafbdel) |
+           (BAFc <= maxbafcdel2 & BAFb <= maxbafbdel2)), `:=` (st5 = 1, excl = 1)]
+  #    Duplications
+  cnvs[(st3 == 0 | st4 == 0) & GT == 2 & logr1 >= maxlogr1 &
+          BAFc <= maxbafcdup, `:=` (st5 = 1, excl = 1)]
+
+  # 5. all the other
   cnvs[(st3 == 0 | st4 == 0) & st5 == -1, `:=` (st5 = 0, excl = 0)]
 
   # check all CNVs from step 3 are assigned
@@ -228,13 +239,13 @@ sortCNVRs <- function(cnvs, loci, cnvrs, minFreq) {
   message("Checking CNVRs frequency and overlaps with the loci")
   # Sort CNVRs in the different categories, done per locus
   # Three categories:
-  # - A: rare or large, alls CNVs are good
+  # - A: large, alls CNVs are good
   # - B: small and common, CNVs to to step 4
   # - C: something in between, CNVs to step 5
 
-  # If the CNVR is rare (freq <= 1%) or large (overlap >= 0.75*llen)
+  # If the CNVR is large (overlap >= 0.75*llen)
   # all CNVs in it are good candidates, category A
-  # If the CNVRs is frequent (freq >= 5% & freq < min_feq ,e.g. 25) and
+  # If the CNVRs is frequent (freq >= 5% & freq > min_feq ,e.g. 25) and
   # small (overlap <= 55%*llen), then it is category B
   # If it has no category it's C
   cnvrsA <- c()
@@ -266,7 +277,7 @@ sortCNVRs <- function(cnvs, loci, cnvrs, minFreq) {
                     pmax(start,as.integer(loc_line[3])) + 1) /
                       as.integer(loc_line[5])]
 
-    cnvrsA <- c(cnvrsA, lcnvrs[freq <= th1 | op >= 0.75, CNVR_ID])
+    cnvrsA <- c(cnvrsA, lcnvrs[op >= 0.75, CNVR_ID])
     # the user should be able to change these values
     cnvrsB <- c(cnvrsB, lcnvrs[freq >= th5 & op <= 0.55, CNVR_ID])
     cnvrsC <- c(cnvrsC, lcnvrs[!CNVR_ID %in% c(cnvrsA, cnvrsB), CNVR_ID])
