@@ -83,7 +83,7 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path, tmp_rds_path) {
 
   # sort columns
   dtOUT <- dtOUT[ , .(sample_ID, locus, putCarrier, LRRSD, BAFdrift, GCWF,
-                      logr1, LRRSDlocus, BAFc, BAFb, centDistProp, overlapProp)]
+                      logr1, LRRSDlocus, BAFc, BAFb, centDistProp, overlapProp, mLRRlocus)]
   return(dtOUT)
 }
 
