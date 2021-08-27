@@ -11,7 +11,7 @@ select_stitch_calls <- function(cnvs, loci, minsnp = 20,
     message("Locus ", lloc)
 
     lcnvs <- cnvs[chr == lchr & start <= lsp &
-                  stop >= lst & numsnp >= minsnp, ]
+                  stop >= lst, ]
     lcnvs[, densnp := round(length / numsnp , digits=0)]
     setorder(lcnvs, sample, type, start)
     lcnvs[, `:=` (stitch = 0, remove = F, gap = NA_real_)]
@@ -60,5 +60,6 @@ select_stitch_calls <- function(cnvs, loci, minsnp = 20,
       else cnvsOUT <- rbind(cnvsOUT, lcnvs)
     }
   }
+  cnvsOUT <- cnvsOUT[numsnp >= minsnp, ]
   return(cnvsOUT)
 }
