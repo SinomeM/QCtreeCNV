@@ -24,7 +24,7 @@ select_stitch_calls <- function(cnvs, loci, minsnp = 20,
     lcnvs <- cnvs[chr == lchr & start <= lsp &
                   end >= lst, ]
     lcnvs[, densnp := round(length / numsnp , digits=0)]
-    setorder(lcnvs, sample, CN, start)
+    setorder(lcnvs, sample_ID, CN, start)
     lcnvs[, `:=` (stitch = 0, remove = F, gap = NA_real_)]
 
     tmpround <- 1
@@ -36,7 +36,7 @@ select_stitch_calls <- function(cnvs, loci, minsnp = 20,
       for (j in 1:(nrow(lcnvs)-1)) {
       k <- j+1
 
-      if (lcnvs$sample[j] == lcnvs$sample[k] & lcnvs$CN[j] == lcnvs$CN[k]) {
+      if (lcnvs$sample_ID[j] == lcnvs$sample_ID[k] & lcnvs$CN[j] == lcnvs$CN[k]) {
         ggap <- (lcnvs[k, start] - lcnvs[j, end]) / (lcnvs[k, end] - lcnvs[j, start])
 
         if (ggap < maxgap) {
