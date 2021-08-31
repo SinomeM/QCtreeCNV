@@ -1,3 +1,14 @@
+#' Select calls in loci and stich close calls
+#'
+#' @param cnvs lorem ipsum
+#' @param loci lorem ipsum
+#' @param minsnp lorem ipsum
+#' @param maxgap lorem ipsum
+#' @param minoverlap lorem ipsum
+#'
+#' @export
+#'
+#' @import data.table
 
 select_stitch_calls <- function(cnvs, loci, minsnp = 20,
                                maxgap = 0.5, minoverlap = 0.2) {
