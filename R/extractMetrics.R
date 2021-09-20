@@ -8,7 +8,6 @@
 #' @param cnvs lorem ipsum
 #' @param pennQC lorem ipsum
 #' @param int_rds_path lorem ipsum
-#' @param tmp_rds_path lorem ipsum
 #'
 #' @export
 #'
@@ -18,7 +17,7 @@
 ## TODO!
 # 1. minimal documentation, in particular on the input files!
 
-extractMetrics <- function(loci, cnvs, pennQC, int_rds_path, tmp_rds_path) {
+extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
 
   # initial checks
   # # TODO
