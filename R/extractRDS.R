@@ -7,6 +7,7 @@
 #' @param loci lorem ipsum
 #' @param samples_file lorem ipsum
 #' @param rds_path lorem ipsum
+#' @param overwrite lorem ipsum
 #'
 #' @export
 #'
@@ -19,11 +20,13 @@
 
 # tar.gz are supported by default if R.utils is installed
 
-extractRDS <- function(loci, samples_file, rds_path) {
+extractRDS <- function(loci, samples_file, rds_path, overwrite=F) {
 
   message("Reading final Reports")
 
   for (s in unique(samples_file$sample_ID)) {
+
+    if (overwrite == F & file.exists(paste0(rds_path, s, ".rds"))) next
 
     ff <- samples_file[sample_ID == s, file_path][1]
 
