@@ -30,7 +30,8 @@ extractRDS <- function(loci, samples_file, rds_path) {
     if (length(ff) == 0) stop("Can't find sample ", s,
                               " in samples list file")
 
-    tmp <- fread(ff, skip = "Sample ID")
+    tmp <- fread(ff, skip = "Sample ID")[,
+             .(Chr, Position, `Log R Ratio`, `B Allele Freq`)]
 
     # select only the points within each locus
     dt <- data.table()
@@ -42,15 +43,10 @@ extractRDS <- function(loci, samples_file, rds_path) {
       }
       st <- loci$start[l]
       sp <- loci$end[l]
-      tmp1 <- tmp[Chr == cc & between(Position, st, sp), ]
-      dt <- rbind(dt,tmp1)
+      dt <- rbind(dt, tmp[Chr == cc & between(Position, st, sp), ])
     }
-
-    dt <- dt[, .(Chr, Position, `Log R Ratio`, `B Allele Freq`)]
-
     saveRDS(dt, paste0(rds_path, s, ".rds"))
+    rm(tmp); rm(dt)
   }
-
 message("Done!")
-
 }
