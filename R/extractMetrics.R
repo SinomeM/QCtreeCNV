@@ -43,7 +43,7 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
                        `B Allele Freq` %in% c(0.2, 0.8), ]) / nrow(tmp)
 
       # sample QC measure from PennCNV
-      qcline <- pennQC[sample_ID == s, ]
+      qcline <- pennQC[sample_ID == s, ][1] # temporary fix!!!!
       dt[sample_ID == s, `:=` (BAFdrift = qcline$BAFdrift,
                                LRRSD = qcline$LRRSD,
                                GCWF = qcline$GCWF)]
