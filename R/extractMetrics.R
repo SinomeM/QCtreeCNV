@@ -31,9 +31,8 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
     message("Locus #", l, ": ", loc)
 
     for (s in ids) {
-      tmp <-
-        readRDS(file.path(int_rds_path,s,".rds"))[Chr == loc[2] &
-                                                  between(Position, as.integer(loc[3]), as.integer(loc[4])),]
+      tmp <- readRDS(paste0(int_rds_path,"/",s,".rds"))[
+               Chr == loc[2] & between(Position, as.integer(loc[3]), as.integer(loc[4])),]
 
       bafc <- nrow(tmp[between(`B Allele Freq`, 0.4, 0.6, incbounds=T), ]) /
                 nrow(tmp)
