@@ -24,7 +24,6 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
 
   ids <- unique(cnvs$sample_ID)
   dtOUT <- data.table()
-  dtLOC <- data.table()
 
   for (l in 1:nrow(loci)) {
     # info on locus
@@ -75,13 +74,9 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
 
       dt[,logr1 := log(abs(mLRRcall / mLRRlocus))]
 
-      # rind all samples and loci together
-      dtLOC <- rbind(dtLOC, dt)
-      rm(dt)
-
     } # end samples loop
-    dtOUT <- rbind(dtOUT, dtLOC)
-    rm(dtLOC)
+    # rind all samples and loci together
+    dtOUT <- rbind(dtOUT, dt)
   } # end loci loop
 
   # sort columns
