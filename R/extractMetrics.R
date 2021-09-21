@@ -52,7 +52,7 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
                          BAFc = bafc, BAFb = bafb)]
 
       # check if this sample has a call in the locus
-      put <- cnvs[Locus == ll & sample_ID == s,]
+      put <- cnvs[locus == ll & sample_ID == s,]
       if (nrow(put) == 0) {
         dt[sample_ID == s, `:=` (putCarrier= F, mLRRcall = NA_real_,
                                  centDistProp = NA_real_, overlapProp = NA_real_)]
