@@ -77,9 +77,11 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
 
       # rind all samples and loci together
       dtLOC <- rbind(dtLOC, dt)
+      rm(dt)
 
     } # end samples loop
     dtOUT <- rbind(dtOUT, dtLOC)
+    rm(dtLOC)
   } # end loci loop
 
   # sort columns
