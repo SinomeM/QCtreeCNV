@@ -28,7 +28,7 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
     # info on locus
     loc <- getline_locus(loci[l])
     dt <- data.table(sample_ID = ids)
-    message("Locus #", l, ": ", loc)
+    message("Locus #", l, ": ", loc[1])
 
     for (s in ids) {
       tmp <- readRDS(paste0(int_rds_path,"/",s,".rds"))[
