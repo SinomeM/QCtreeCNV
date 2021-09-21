@@ -23,6 +23,7 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
   # # TODO
 
   ids <- unique(cnvs$sample_ID)
+  dtOUT <- data.table()
 
   for (l in 1:nrow(loci)) {
     # info on locus
