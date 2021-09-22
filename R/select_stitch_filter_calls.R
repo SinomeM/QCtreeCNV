@@ -61,7 +61,7 @@ select_stitch_calls <- function(cnvs, loci, minsnp = 20,
                   locus = lloc)]
     lcnvs <- lcnvs[overlap >= minoverlap, ]
 
-    if (!"overlap" %in% colnames(lcnvs)) lcnvs$overlap <- NA_real_
+    # if (!"overlap" %in% colnames(lcnvs)) lcnvs$overlap <- NA_real_
     
     if (nrow(lcnvs) > 0) {
       if (l == 1) {
