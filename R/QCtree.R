@@ -207,11 +207,11 @@ step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
   #    well out of range or both with lower thresholds then it's excluded
   #    Deletions
   cnvs[(st3 == 0 | st4 == 0) & GT == 1 & LRRSDlocus > maxlrrsd &
-          ((BAFc <= maxbafcdel | BAFb <= maxbafbdel) |
-           (BAFc <= maxbafcdel2 & BAFb <= maxbafbdel2)), `:=` (st5 = 1, excl = 1)]
+          ((BAFc > maxbafcdel | BAFb > maxbafbdel) |
+           (BAFc > maxbafcdel2 & BAFb > maxbafbdel2)), `:=` (st5 = 1, excl = 1)]
   #    Duplications
   cnvs[(st3 == 0 | st4 == 0) & GT == 2 & LRRSDlocus > maxlrrsd &
-          BAFc <= maxbafcdup, `:=` (st5 = 1, excl = 1)]
+          BAFc > maxbafcdup, `:=` (st5 = 1, excl = 1)]
 
   # 3. LRRSDlocus extremely high
   cnvs[(st3 == 0 | st4 == 0) & LRRSDlocus > exclLRRSD, `:=` (st5 = 1, excl = 1)]
