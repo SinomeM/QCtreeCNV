@@ -149,7 +149,7 @@ step2 <- function(cnvs, cnvrs, minov) {
   # CNVs from step 1 == 0 that are in a cnvrA will pass step 2 (to good CNVs)
   cnvs[st1 == 0 & CNVR_ID %in% cnvrs[[1]] & overlap > minov, `:=` (st2 = 1, excl = 0)]
   # CNVs from step 1 == 0 that are in a cnvrA will fail step 2 (to step3)
-  cnvs[st1 == 0 & !(CNVR_ID %in% cnvrs[[1]] & overlap ...), st2 := 0]
+  cnvs[st1 == 0 & !(CNVR_ID %in% cnvrs[[1]] & overlap > minov), st2 := 0]
 
   # check all CNVs from step 1 are assigned
   if (!all(cnvs[st1 == 0, st2] %in% c(1,0)))
