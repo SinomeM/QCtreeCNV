@@ -227,7 +227,10 @@ step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
   cnvs[(st3 == 0 | st4 == 0) & GT == 2 & logr1 >= maxlogr1 &
           BAFc > maxbafcdup, `:=` (st5 = 1, excl = 1)]
 
-  # 5. all the other
+  # 5. logr1 very very out of boundaries
+  nvs[(st3 == 0 | st4 == 0) & (logr1 > 1 | logr1 < -1), `:=` (st5 = 1, excl = 1)]
+  
+  # 6. all the other
   cnvs[(st3 == 0 | st4 == 0) & st5 == -1, `:=` (st5 = 0, excl = 0)]
 
   # check all CNVs from step 3 are assigned
