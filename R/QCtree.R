@@ -22,6 +22,7 @@
 #' @param st5maxBAFbDEL lorem ipsum
 #' @param st5maxBAFbDUP lorem ipsum
 #' @param clean_out lorem ipsum
+#' @param st5exclLRRSD lorem ipsum 
 #'
 #' @export
 #'
@@ -59,7 +60,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
                    st5maxLRRSDlocus=0.35, st5maxlogr1=0.5,
                    st5maxBAFcDEL=.05, st5maxBAFcDUP=.15,
                    st5maxBAFbDEL=.1, st5maxBAFbDUP=NA,
-                   clean_out = T) {
+                   clean_out = T, st5exclLRRSD = 0.65) {
 
   ### Pre process ###
 
@@ -114,7 +115,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   cnvsOUT <- step5(cnvsOUT, 0, -0.3, st5maxLRRSDlocus,
                    st5maxlogr1, st5maxBAFcDEL,
                    st5maxBAFcDUP, st5maxBAFbDEL,
-                   st4maxBAFcDEL, st4maxBAFbDEL)
+                   st4maxBAFcDEL, st4maxBAFbDEL, st5exclLRRSD)
 
   ### RETURN ###
   message("# -------------------------- #\n",
@@ -194,7 +195,7 @@ step4 <- function(cnvs, minlogr1, maxlogr1, maxbafcdel, maxbafcdup, maxbafbdel) 
 
 step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
                   maxlogr1, maxbafcdel, maxbafcdup,
-                  maxbafbdel, maxbafcdel2, maxbafbdel2) {
+                  maxbafbdel, maxbafcdel2, maxbafbdel2, exclLRRSD) {
   cnvs[, st5 := -1]
   # Takes calls from st3 = 0 or st4 = 0
 
@@ -213,16 +214,16 @@ step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
           BAFc <= maxbafcdup, `:=` (st5 = 1, excl = 1)]
 
   # 3. LRRSDlocus extremely high
-  cnvs[(st3 == 0 | st4 == 0) & LRRSDlocus > 0.55, `:=` (st5 = 1, excl = 1)]
+  cnvs[(st3 == 0 | st4 == 0) & LRRSDlocus > exclLRRSD, `:=` (st5 = 1, excl = 1)]
 
   # 4. logr1 and BAFc | BAFb weel out
   #    Deletions
   cnvs[(st3 == 0 | st4 == 0) & GT == 1 & logr1 >= maxlogr1 &
-          ((BAFc <= maxbafcdel | BAFb <= maxbafbdel) |
-           (BAFc <= maxbafcdel2 & BAFb <= maxbafbdel2)), `:=` (st5 = 1, excl = 1)]
+          ((BAFc > maxbafcdel | BAFb > maxbafbdel) |
+           (BAFc > maxbafcdel2 & BAFb > maxbafbdel2)), `:=` (st5 = 1, excl = 1)]
   #    Duplications
   cnvs[(st3 == 0 | st4 == 0) & GT == 2 & logr1 >= maxlogr1 &
-          BAFc <= maxbafcdup, `:=` (st5 = 1, excl = 1)]
+          BAFc > maxbafcdup, `:=` (st5 = 1, excl = 1)]
 
   # 5. all the other
   cnvs[(st3 == 0 | st4 == 0) & st5 == -1, `:=` (st5 = 0, excl = 0)]
