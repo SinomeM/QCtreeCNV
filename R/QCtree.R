@@ -54,7 +54,7 @@
 # - step 4
 qctree <- function(cnvs, cnvrs, qsdt, loci,
                    maxLRRSD=.35, maxBAFdrift=.01,maxGCWF=.02, minGCWF=-.02,
-                   commonCNVRsMinFreq = NA,
+                   commonCNVRsMinFreq = NA, st2minov = 0.65,
                    st4minlogr1=-.35,st4maxlogr1=.4, st4maxBAFcDEL=.03,
                    st4maxBAFcDUP=.125, st4maxBAFbDEL=0.075,
                    st5maxLRRSDlocus=0.35, st5maxlogr1=0.5,
@@ -94,7 +94,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   cnvrs_groups <- sortCNVRs(cnvs, loci, cnvrs, commonCNVRsMinFreq)
 
   # STEP 2
-  cnvsOUT <- step2(cnvsOUT, cnvrs_groups)
+  cnvsOUT <- step2(cnvsOUT, cnvrs_groups, st2minov)
 
   # STEP 3
   cnvsOUT <- step3(cnvsOUT, cnvrs_groups)
@@ -144,12 +144,12 @@ step1 <- function(cnvs, mlrrsd, mbafd, mingc, maxgc) {
   return(cnvs)
 }
 
-step2 <- function(cnvs, cnvrs) {
+step2 <- function(cnvs, cnvrs, minov) {
   cnvs[, st2 := -1]
   # CNVs from step 1 == 0 that are in a cnvrA will pass step 2 (to good CNVs)
-  cnvs[st1 == 0 & CNVR_ID %in% cnvrs[[1]], `:=` (st2 = 1, excl = 0)]
+  cnvs[st1 == 0 & CNVR_ID %in% cnvrs[[1]] & overlap > minov, `:=` (st2 = 1, excl = 0)]
   # CNVs from step 1 == 0 that are in a cnvrA will fail step 2 (to step3)
-  cnvs[st1 == 0 & !CNVR_ID %in% cnvrs[[1]], st2 := 0]
+  cnvs[st1 == 0 & !(CNVR_ID %in% cnvrs[[1]] & overlap ...), st2 := 0]
 
   # check all CNVs from step 1 are assigned
   if (!all(cnvs[st1 == 0, st2] %in% c(1,0)))
