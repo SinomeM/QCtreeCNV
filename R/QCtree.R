@@ -164,6 +164,8 @@ step3 <- function(cnvs, cnvrs) {
   # CNVs from step 2 == 0 that are in a cnvrC will go to step 5
   cnvs[st2 == 0 & CNVR_ID %in% cnvrs[[2]], st3 := 1]
   cnvs[st2 == 0 & CNVR_ID %in% cnvrs[[3]], st3 := 0]
+  # The one in cnvrA but not large enough will go to step 5
+  cnvs[st2 == 0 & st3 == -1, st3 := 0]
 
   # check all CNVs from step 2 are assigned
   if (!all(cnvs[st2 == 0, st3] %in% c(1,0)))
