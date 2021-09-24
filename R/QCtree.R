@@ -228,7 +228,7 @@ step5 <- function(cnvs, maxmLRRdel, minmLRRdup, maxlrrsd,
           BAFc > maxbafcdup, `:=` (st5 = 1, excl = 1)]
 
   # 5. logr1 very very out of boundaries
-  nvs[(st3 == 0 | st4 == 0) & (logr1 > 1 | logr1 < -1), `:=` (st5 = 1, excl = 1)]
+  cnvs[(st3 == 0 | st4 == 0) & (logr1 > 1 | logr1 < -1), `:=` (st5 = 1, excl = 1)]
   
   # 6. all the other
   cnvs[(st3 == 0 | st4 == 0) & st5 == -1, `:=` (st5 = 0, excl = 0)]
