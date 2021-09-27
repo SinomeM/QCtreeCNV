@@ -19,8 +19,8 @@ saveCNVplots <- function(cnvs, plots_path, loci, sample_list, reg_len = 2000000)
     s <- cnvs[i, sample_ID]
     loc <- cnvs[i, locus]
     ll <- getline_locus(loci[locus == loc,])
-    r_st <- ll[3] - reg_len
-    r_en <- ll[3] + reg_len
+    r_st <- as.integer(ll[3]) - reg_len
+    r_en <- as.integer(ll[3]) + reg_len
 
     fp <- samples_file[sample_ID == s, file_path][1]
     if (length(fp) == 0) stop("Can't find sample ", s,
@@ -29,7 +29,8 @@ saveCNVplots <- function(cnvs, plots_path, loci, sample_list, reg_len = 2000000)
              Chr == ll[2] & between(Position, r_st, r_en),
              .(Chr, Position, `Log R Ratio`, `B Allele Freq`)]
     colnames(raw) <- c("Chr", "Position", "LRR", "BAF")
-    raw[between(Position, ll[3], ll[4]), core := T][is.na(core), core := F]
+    raw[between(as.integer(Position), as.integer(ll[3]), as.integer(ll[4])),
+        core := T][is.na(core), core := F]
 
     m <- 1000000
     cc <- ifelse(cnvs[i, GT] == 1, "red", "green")
