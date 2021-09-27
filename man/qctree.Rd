@@ -14,6 +14,7 @@ qctree(
   maxGCWF = 0.02,
   minGCWF = -0.02,
   commonCNVRsMinFreq = NA,
+  st2minov = 0.65,
   st4minlogr1 = -0.35,
   st4maxlogr1 = 0.4,
   st4maxBAFcDEL = 0.03,
@@ -25,7 +26,8 @@ qctree(
   st5maxBAFcDUP = 0.15,
   st5maxBAFbDEL = 0.1,
   st5maxBAFbDUP = NA,
-  clean_out = T
+  clean_out = T,
+  st5exclLRRSD = 0.65
 )
 }
 \arguments{
@@ -68,6 +70,8 @@ qctree(
 \item{st5maxBAFbDUP}{lorem ipsum}
 
 \item{clean_out}{lorem ipsum}
+
+\item{st5exclLRRSD}{lorem ipsum}
 }
 \description{
 The main functions of the \code{QCtreeCNV} package

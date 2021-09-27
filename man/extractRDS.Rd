@@ -4,7 +4,7 @@
 \alias{extractRDS}
 \title{Extratc Raw Data in Specific Loci}
 \usage{
-extractRDS(loci, samples_file, rds_path)
+extractRDS(loci, samples_file, rds_path, overwrite = F)
 }
 \arguments{
 \item{loci}{lorem ipsum}
@@ -12,6 +12,8 @@ extractRDS(loci, samples_file, rds_path)
 \item{samples_file}{lorem ipsum}
 
 \item{rds_path}{lorem ipsum}
+
+\item{overwrite}{lorem ipsum}
 }
 \description{
 \code{extractRDS()} extract the raw LRR and BAF values in the loci from

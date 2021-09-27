@@ -37,6 +37,7 @@ test_that("Step 1 behaves correctly.", {
 
 # STEP 2 #
 
+if (F) {
 # only locus columns is needed in the CNV object for this function
 dtc <- data.table(locus = c(rep.int("a", 10), rep.int("b", 15),
                             rep.int("c", 20), rep.int("d", 30)))
@@ -74,7 +75,7 @@ test_that("Step 2 behave as expected", {
             expect_equal(dt$excl[3], -1)
 })
 
-
+}
 
 # STEP 3 #
 

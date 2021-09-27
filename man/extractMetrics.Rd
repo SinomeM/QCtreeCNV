@@ -4,7 +4,7 @@
 \alias{extractMetrics}
 \title{Extratc QC metrics}
 \usage{
-extractMetrics(loci, cnvs, pennQC, int_rds_path, tmp_rds_path)
+extractMetrics(loci, cnvs, pennQC, int_rds_path)
 }
 \arguments{
 \item{loci}{lorem ipsum}
@@ -14,8 +14,6 @@ extractMetrics(loci, cnvs, pennQC, int_rds_path, tmp_rds_path)
 \item{pennQC}{lorem ipsum}
 
 \item{int_rds_path}{lorem ipsum}
-
-\item{tmp_rds_path}{lorem ipsum}
 }
 \description{
 \code{extractMetrics()} extract the QC metrics from the raw data in RDS
