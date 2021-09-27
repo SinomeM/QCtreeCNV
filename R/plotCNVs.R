@@ -67,7 +67,7 @@ saveCNVplots <- function(cnvs, plots_path, loci, samples_file, reg_len = 2000000
 
       cnvs[i, Plotname := pl_path]
 
-      png(pl_path)
+      png(pl_path, 520, 480)
       print(pl)
       dev.off()
   }
