@@ -242,6 +242,67 @@ Fig 3:
 5. df
 6. dfd
 
+# Full pipeline example pseudo-code
+
+Three main objects are needed to run the pipeline:
+
+1. `cnvs`, PennCNV calling results;
+2. `sample_list`, as described earlier;
+3. `loci`, list of loci of interest, as described earlier;
+4. `qccnvs`, PennCNV main QC file, one line per sample.
+
+Assuming the objects have the required columns we can start by checking
+`chr` is in the correct format and computing `GT` with the provided helper
+functions
+
+**NB**: there will be a wrapper function to run the entire pipeline or at least
+big chunks of it.
+
+```{r, eval = F}
+cnvs <- QCtreeCNV:::chr_uniform(cnvs)
+cnvs <- QCtreeCNV:::uniform_GT_CN(cnvs)
+loci <- QCtreeCNV:::chr_uniform(loci)
+```
+
+At this point we can select the putative calls using the function
+`select_stitch_calls()`, this will also stitch close calls by default.
+Maximum gap in the stitching, minim number of SNPs and minim overlap with
+a locus can be set by the user.
+
+```{r, eval = F}
+put_cnvs <- select_stitch_calls(cnvs, loci)
+```
+
+Now we can extract the data we need from the intensity files and then create
+the master QC object needed by the main function. We are also ready to run
+the CNVR computation.
+
+Note that these steps may be slow and can be run in parallel of further parallelized.
+As an example, data extraction from the intensity files can be parallelized by splitting
+the `put_cnvs` object.
+
+```{r, eval = F}
+extractRDS(loci, sample_list, "path/to/wkdir/tmp/")
+
+cnvrs <- cnvrs_create(cnvs=put_cnvs, chr_arms=hg19_chr_arms)
+
+putQC <- extractMetrics(loci, put_cnvs, qccnvs, "path/to/wkdir/tmp")
+```
+
+Now we have all the ingredients for the main function, `qctree()`:
+
+```{r, eval = F}
+put_cnvs_qc <- qctree(put_cnvs, cnvrs[[1]], putQC, loci)
+```
+
+The column `excl` is 1 for "bad" calls and 0 for "good" ones, so
+to filter the bad one we can create a new object.
+
+```{r, eval = F}
+put_cnvs_filtered <- put_cnvs_qc[excl == 0, ]
+```
+
+
 # Session
 
 ```{r}
