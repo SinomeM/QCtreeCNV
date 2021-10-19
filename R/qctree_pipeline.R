@@ -7,8 +7,12 @@
 #' is still something the user needs to take care of. Only defaults values
 #' for each step are supported at the moment (will change soon)
 
+# ideally some step will be parallelized
+# also the idea is that cnvrs can be passed already computed, however
+# in that case the CNV calls must also be already the equivalent of put_cnvs
 
-qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path,
+
+qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs = NA,
                             hg_version = c("gh18", "hg19", "hg38")) {
   # check column names for all main objects
   if (!all(c("locus", "chr", "start", "end") %in% colnames(loci)))
@@ -22,6 +26,13 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path,
 
   if (!all(c() %in% colnames(samples_list)))
     stop("Some columns are missing from samples list object")
+
+  if(!is.na(cnvrs)) {
+    if (!all(c() %in% colnames(cnvrs)))
+      stop("Some columns are missing from cnvrs object")
+    if (!all(c("CNVR_ID", "locus") %in% colnames(calls))) # other????
+      stop("cnvrs are passed but no CNVR_ID | locus column is found in the cnv object")
+  }
 
   # error if samples are not unique in the QC file
   if (length(pennqc$sample_ID) != length(unique(pennqc$sample_ID)) )
@@ -48,17 +59,19 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path,
   put_cnvs <- select_stitch_calls(calls, loci)
 
   # compute CNVRs (long step)
-  if (hg_version == "hg18") arms <- [...]
-  if (hg_version == "hg19") arms <- [...]
-  if (hg_version == "hg38") arms <- [...]
-  cnvrs <- cnvrs_create(put_cnvs, arms)
-  put_cnvs <- cnvrs[[2]]
+  if (is.na(cnvrs)) {
+    if (hg_version == "hg18") arms <- [...]
+    if (hg_version == "hg19") arms <- [...]
+    if (hg_version == "hg38") arms <- [...]
+    cnvrs <- cnvrs_create(put_cnvs, arms)
+    put_cnvs <- cnvrs[[2]]
+  }
 
   # extract RDS (very long step because of I/O)
   extractRDS(loci, samples_list, rds_path)
 
   # create final QC table
-  ...
+  qc <- extractMetrics(loci, put_cnvs, pennqc, rds_path)
 
   # if there is more than one call per locus in a sample, keep the largest one
   duprm <- data.table()
@@ -72,6 +85,5 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path,
   }
   put_cnvs <- fsetdiff(put_cnvs, duprm)
 
-
-
+  return(list(put_cnvs, cnvrs[[1]], qc, loci))
 }
