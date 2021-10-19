@@ -143,6 +143,7 @@ uniform_GT_CN <- function(DT_in) {
 # <int> when needed (GT, CN, st/en etc.)
 
 # BE CAREFUL, not all functions are smart enough to do this!!!
+# change it tot a list ????
 
 getline_cnv <- function(cnv) {
   if (!"CNVR_ID" %in% colnames(cnv)) stop("CNVR_ID column is missing")
