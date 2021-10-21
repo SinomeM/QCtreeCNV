@@ -56,7 +56,7 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
       put <- cnvs[locus == loc[1] & sample_ID == s,]
       if (nrow(put) == 0) {
         dt[sample_ID == s, `:=` (putCarrier= F, mLRRcall = NA_real_,
-                                 centDistProp = NA_real_, overlapProp = NA_real_)]
+                                 centDistProp = NA_real_)]
       } else {
         # A sample can have only one call per locus
         if (nrow(put) > 1) stop(paste0("Sample ", s, " has more than one call in",
@@ -68,8 +68,7 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
         if (ov < 0) stop("Something is wrong, overlap can't be negative)")
         dt[sample_ID == s, `:=` (putCarrier =T,
                                  mLRRcall = mean(tmp1[, `Log R Ratio`], na.rm=T),
-                                 centDistProp = abs(as.integer(loc[6]) - as.integer(putline[9])) / as.integer(loc[5]),
-                                 overlapProp = as.integer(putline[8]) / as.integer(loc[5]))]
+                                 centDistProp = abs(as.integer(loc[6]) - as.integer(putline[9])) / as.integer(loc[5]))]
       }
 
       dt[,logr1 := log(abs(mLRRcall / mLRRlocus))]
@@ -81,7 +80,7 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
 
   # sort columns
   dtOUT <- dtOUT[ , .(sample_ID, locus, putCarrier, LRRSD, BAFdrift, GCWF,
-                      logr1, LRRSDlocus, BAFc, BAFb, centDistProp, overlapProp, mLRRlocus)]
+                      logr1, LRRSDlocus, BAFc, BAFb, centDistProp, mLRRlocus)]
   return(dtOUT)
 }
 
