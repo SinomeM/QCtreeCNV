@@ -60,9 +60,9 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs =
 
   # compute CNVRs (long step)
   if (is.na(cnvrs)) {
-    if (hg_version == "hg18") arms <- [...]
-    if (hg_version == "hg19") arms <- [...]
-    if (hg_version == "hg38") arms <- [...]
+    #     if (hg_version == "hg18") arms <- [...]
+    #     if (hg_version == "hg19") arms <- [...]
+    #     if (hg_version == "hg38") arms <- [...]
     cnvrs <- cnvrs_create(put_cnvs, arms)
     put_cnvs <- cnvrs[[2]]
   }
@@ -75,7 +75,7 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs =
 
   # if there is more than one call per locus in a sample, keep the largest one
   duprm <- data.table()
-  for (l %in% unique(put_cnvs[, locus])) {
+  for (l in unique(put_cnvs[, locus])) {
     a <- put_cnvs[locus == l, ]
     b <- a[sample_ID %in% a$sample_ID[duplicated(a$sample_ID)], ]
     for (s in unique(b$sample_ID)) {
