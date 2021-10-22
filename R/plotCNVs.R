@@ -5,7 +5,7 @@
 #' @param cnvs lorem ipsum
 #' @param loci lorem ipsum
 #' @param plots_path lorem ipsum
-#' @param sample_list lorem ipsum
+#' @param samples_list lorem ipsum
 #' @param reg_len lorem ipsum
 #'
 #' @export
