@@ -4,7 +4,14 @@
 \alias{saveCNVplots}
 \title{Save CNVs plots for Visual Inspection}
 \usage{
-saveCNVplots(cnvs, plots_path, loci, samples_file, reg_len = 2e+06)
+saveCNVplots(
+  cnvs,
+  plots_path,
+  loci,
+  samples_file,
+  reg_len = 2e+06,
+  overwrite = F
+)
 }
 \arguments{
 \item{cnvs}{lorem ipsum}
@@ -15,7 +22,7 @@ saveCNVplots(cnvs, plots_path, loci, samples_file, reg_len = 2e+06)
 
 \item{reg_len}{lorem ipsum}
 
-\item{sample_list}{lorem ipsum}
+\item{samples_list}{lorem ipsum}
 }
 \description{
 Plot LRR BAF plots and save them to be used in visual inspection
