@@ -183,3 +183,14 @@ getline_locus <- function(locus) {
   myline <- c(locus$locus, locus$chr, st, en, l, cen)
   return(myline)
 }
+
+getline_locus2 <- function(locus) {
+  st <- locus$start
+  en <- locus$end
+  if ("length" %in% colnames(locus)) l <- locus$length
+  else l <- en - st + 1
+  cen <- st + l/2
+  #                      1          2   3   4  5
+  myline <- as.integer(c(locus$chr, st, en, l, cen))
+  return(myline)
+}
