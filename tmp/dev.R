@@ -11,6 +11,10 @@ devtools::check()
 
 devtools::build()
 
+devtools::install()
+
+browseVignettes("QCtreeCNV")
+
 library(data.table)
 
 f <-  QCtreeCNV:::step3
