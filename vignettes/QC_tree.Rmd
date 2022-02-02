@@ -113,7 +113,7 @@ Table 2 consist of [...]
 | :----------  | :----:    | :---- |
 | sample_ID    | \<chr\>   | _     |
 | locus        | \<chr\>   | _     |
-| putCarrier  | \<logi\>  | is the sample a putative carrier for this locus?\* |
+| putCarrier   | \<logi\>  | is the sample a putative carrier for this locus?\* |
 | logr1        | \<num\>   | \*\*     |
 | LRRSDlocus   | \<num\>   | \*\*     |
 | BAFc         | \<num\>   | \*\*     |
@@ -128,7 +128,8 @@ Table 2 consist of [...]
 one line is created for each sample/locus combination, even if the
 sample is a putative carrier only for one specific locus. Note
 however that this is not mandatory, it is for done mostly to reuse
-computation time in downstream efficacy measures.   
+computation time in downstream efficacy measures.
+
 \*\*: details on each measure is given below.
 
 Details [...]
