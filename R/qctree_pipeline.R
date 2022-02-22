@@ -13,7 +13,7 @@
 
 
 qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs = NA,
-                            hg_version = c("gh18", "hg19", "hg38")) {
+                            hg_version = c("gh18", "hg19", "hg38"), rm_dup = T) {
   # check column names for all main objects
   if (!all(c("locus", "chr", "start", "end") %in% colnames(loci)))
     stop("Some columns are missing from loci object")
@@ -74,16 +74,18 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs =
   qc <- extractMetrics(loci, put_cnvs, pennqc, rds_path)
 
   # if there is more than one call per locus in a sample, keep the largest one
-  duprm <- data.table()
-  for (l in unique(put_cnvs[, locus])) {
-    a <- put_cnvs[locus == l, ]
-    b <- a[sample_ID %in% a$sample_ID[duplicated(a$sample_ID)], ]
-    for (s in unique(b$sample_ID)) {
-      lk <- max(b[sample_ID == s, length])
-      duprm <- rbind(duprm, b[sample_ID == s & length != lk, ])
+  if (rm_dup) {
+    duprm <- data.table()
+    for (l in unique(put_cnvs[, locus])) {
+      a <- put_cnvs[locus == l, ]
+      b <- a[sample_ID %in% a$sample_ID[duplicated(a$sample_ID)], ]
+      for (s in unique(b$sample_ID)) {
+        lk <- max(b[sample_ID == s, length])
+        duprm <- rbind(duprm, b[sample_ID == s & length != lk, ])
+      }
     }
+    put_cnvs <- fsetdiff(put_cnvs, duprm)
   }
-  put_cnvs <- fsetdiff(put_cnvs, duprm)
 
   return(list(put_cnvs, cnvrs[[1]], qc, loci))
 }
