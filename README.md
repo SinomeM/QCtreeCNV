@@ -17,7 +17,7 @@ before visual inspection, as exemplified in this figure.
 
 The filtering pipeline is implemented as a decision making tree, a series of
 consecutive steps that separate good putative candidates form bad ones.
-This scheme gives a good first peek at this process.
+This scheme describe the process.
 
 ![QCtree](./vignettes/QCtree.png)
 
