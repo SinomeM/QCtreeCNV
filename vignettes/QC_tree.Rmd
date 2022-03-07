@@ -94,6 +94,7 @@ Table 1 consist of the [...]
 | chr         | \<int\>  | 1:24   |
 | start       | \<int\>  | _      |
 | end         | \<int\>  | _      |
+| numsnp      | \<int\>  | number of SNPs contributing to the call |
 | GT          | \<int\>  | 0/1/2\*|
 | CN          | \<int\>  | 0:5\*  |
 | CNVR_ID     | \<chr\>  | this columns is added by the package |
@@ -162,6 +163,7 @@ needs to have the following format:
 |-------------|:------:|---------------------------------------------------|
 | sample_ID   | <chr>  | as in table 1, 2 and 3                            |
 | file_path   | <chr>  | full path (from `/` or `~`) to the intensity file |
+| file_path_tabix | <chr> | full path (from `/` or `~`) to the tabix indexed intensity file |
 
 ### Loci coordinates
 
@@ -197,6 +199,13 @@ computed by PennCNV anyway.
 
 Please note that the package expect one file for each sample.
 
+### Tabix indexing
+
+Please refer to the Current Protocol manuscript (see `citation()`)
+and the accompanying repository at https://github.com/SinomeM/IBPcnv
+for instructions on how to index the intensity files.
+
+  
 # Run the Pipeline
 
 The package has two main functions:
