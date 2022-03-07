@@ -13,7 +13,7 @@
 
 
 qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs = NA,
-                            hg_version = c("gh18", "hg19", "hg38")) {
+                            hg_version = c("gh18", "hg19", "hg38"), snppos = NA) {
   # check column names for all main objects
   if (!all(c("locus", "chr", "start", "end") %in% colnames(loci)))
     stop("Some columns are missing from loci object")
@@ -67,11 +67,11 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs =
     put_cnvs <- cnvrs[[2]]
   }
 
-  # extract RDS (very long step because of I/O)
-  extractRDS(loci, samples_list, rds_path)
+###  # extract RDS (very long step because of I/O)
+###  extractRDS(loci, samples_list, rds_path)
 
   # create final QC table
-  qc <- extractMetrics(loci, put_cnvs, pennqc, rds_path)
+  qc <- extractMetrics(loci, put_cnvs, pennqc, samples_list, snppos)
 
   # if there is more than one call per locus in a sample, keep the largest one
   duprm <- data.table()
