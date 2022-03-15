@@ -7,7 +7,8 @@
 #' @param loci lorem ipsum
 #' @param cnvs lorem ipsum
 #' @param pennQC lorem ipsum
-#' @param int_rds_path lorem ipsum
+#' @param samples_list lorem ipsum
+#' @param snppos lorem ipsum
 #'
 #' @export
 #'
@@ -17,7 +18,7 @@
 ## TODO!
 # 1. minimal documentation, in particular on the input files!
 
-extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
+extractMetrics <- function(loci, cnvs, pennQC, samples_list, snppos = NA) {
 
   # initial checks
   # # TODO
@@ -32,8 +33,14 @@ extractMetrics <- function(loci, cnvs, pennQC, int_rds_path) {
     message("Locus #", l, ": ", loc[1])
 
     for (s in ids) {
-      tmp <- readRDS(paste0(int_rds_path,"/",s,".rds"))[
-               Chr == loc[2] & between(Position, as.integer(loc[3]), as.integer(loc[4])),]
+
+      f_path <- samples_list[sample_ID == s, file_path_tabix]
+      if (length(f_path > 1)) {
+            warning("sample ", s, " has more than one entry in samples_file")
+            f_path <- f_path[1]
+      }
+
+      tmp <- get_region_tabix(loc[2], loc[3], loc[4], f_path, snppos)
 
       bafc <- nrow(tmp[between(`B Allele Freq`, 0.4, 0.6, incbounds=T), ]) /
                 nrow(tmp)

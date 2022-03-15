@@ -13,8 +13,8 @@
 
 
 qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs = NA,
-                            hg_version = c("gh18", "hg19", "hg38"), rm_dup = T) {
-  
+                            hg_version = c("gh18", "hg19", "hg38"), snppos = NA) {
+
   check_inputs(loci, calls, pennqc, samples_list)
 
   # check and correct chr & GT/CN
@@ -38,11 +38,11 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs =
     put_cnvs <- cnvrs[[2]]
   }
 
-  # extract RDS (very long step because of I/O)
-  extractRDS(loci, samples_list, rds_path)
+###  # extract RDS (very long step because of I/O)
+###  extractRDS(loci, samples_list, rds_path)
 
   # create final QC table
-  qc <- extractMetrics(loci, put_cnvs, pennqc, rds_path)
+  qc <- extractMetrics(loci, put_cnvs, pennqc, samples_list, snppos)
 
   # if there is more than one call per locus in a sample, keep the largest one
   if (rm_dup) {
