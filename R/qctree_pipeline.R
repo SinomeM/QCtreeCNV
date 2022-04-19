@@ -56,7 +56,7 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
   # create final QC table
   qc <- extractMetrics(loci, put_cnvs, pennqc, rds_path)
 
-  return(list(put_cnvs, qc, loci))
+  return(list(put_cnvs, qc))
 }
 
 

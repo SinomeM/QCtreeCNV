@@ -17,6 +17,7 @@ RoxygenNote: 7.1.1
 Depends: 
     R (>= 3.0.0),
     ggplot2,
+    fpc,
     cowplot
 Suggests: 
     knitr,
