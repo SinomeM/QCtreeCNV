@@ -12,7 +12,7 @@
 # in that case the CNV calls must also be already the equivalent of put_cnvs
 
 
-qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs = NA,
+qctree_pre <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs = NA,
                             hg_version = c("gh18", "hg19", "hg38"), rm_dup = T) {
   # check column names for all main objects
   if (!all(c("locus", "chr", "start", "end") %in% colnames(loci)))
@@ -47,9 +47,9 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs =
     warning("Some calls are from samples not present in the samples list object")
 
   # check and correct chr & GT/CN
-  loci <- chr_uniform(loci)
-  calls <- chr_uniform(calls)
-  calls <- uniform_GT_CN(calls)
+  chr_uniform(loci)
+  chr_uniform(calls)
+  uniform_GT_CN(calls)
 
   # add length
   loci[, length := end - start + 1]
