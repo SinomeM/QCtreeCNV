@@ -41,7 +41,7 @@ cnvrs_create <- function(cnvs, chr_arms, prop = 0.3, final_merge = T) {
 
   # check input formats, in particular for chr_arms
   chr_arms[, `:=` (start = as.integer(start), end = as.integer(end))]
-  chr_arms <- chr_uniform(chr_arms)
+  chr_uniform(chr_arms)
 
   # sort per chr, start & end
   setorder(cnvs_cp, chr, start, end)

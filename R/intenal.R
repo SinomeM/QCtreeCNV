@@ -93,8 +93,6 @@ chr_uniform <- function(DT_in) {
 
   # drop calls not in chrs 1:22, X, Y
   DT_in <- DT_in[chr %in% as.character(1:24), ]
-
-  return(DT_in)
 }
 
 # -----------------------------------------------------------------------------
@@ -131,8 +129,6 @@ uniform_GT_CN <- function(DT_in) {
   DT_in[chr %in% as.character(1:22) & CN == 2, GT := 0][
           chr %in% as.character(1:22) & CN < 2, GT := 1][
           chr %in% as.character(1:22) & CN > 2, GT := 2]
-
-  return(DT_in)
 }
 
 

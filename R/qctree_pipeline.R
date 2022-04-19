@@ -6,14 +6,16 @@
 #' Please note that at the moment having the input in the required format
 #' is still something the user needs to take care of. Only defaults values
 #' for each step are supported at the moment (will change soon)
+#' @export
+#'
+#' @import data.table
 
 # ideally some step will be parallelized
 # also the idea is that cnvrs can be passed already computed, however
 # in that case the CNV calls must also be already the equivalent of put_cnvs
 
 
-qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs = NA,
-                            hg_version = c("gh18", "hg19", "hg38"), rm_dup = T) {
+qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T) {
   # check column names for all main objects
   if (!all(c("locus", "chr", "start", "end") %in% colnames(loci)))
     stop("Some columns are missing from loci object")
@@ -47,9 +49,9 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs =
     warning("Some calls are from samples not present in the samples list object")
 
   # check and correct chr & GT/CN
-  loci <- chr_uniform(loci)
-  calls <- chr_uniform(calls)
-  calls <- uniform_GT_CN(calls)
+  chr_uniform(loci)
+  chr_uniform(calls)
+  uniform_GT_CN(calls)
 
   # add length
   loci[, length := end - start + 1]
@@ -58,17 +60,14 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs =
   # select and stitch calls in the required loci
   put_cnvs <- select_stitch_calls(calls, loci)
 
-  # compute CNVRs (long step)
-  if (is.na(cnvrs)) {
-    #     if (hg_version == "hg18") arms <- [...]
-    #     if (hg_version == "hg19") arms <- [...]
-    #     if (hg_version == "hg38") arms <- [...]
-    cnvrs <- cnvrs_create(put_cnvs, arms)
-    put_cnvs <- cnvrs[[2]]
-  }
-
-  # extract RDS (very long step because of I/O)
-  extractRDS(loci, samples_list, rds_path)
+  #   # compute CNVRs (long step)
+  #   if (is.na(cnvrs)) {
+  #     #     if (hg_version == "hg18") arms <- [...]
+  #     #     if (hg_version == "hg19") arms <- [...]
+  #     #     if (hg_version == "hg38") arms <- [...]
+  #     cnvrs <- cnvrs_create(put_cnvs, arms)
+  #     put_cnvs <- cnvrs[[2]]
+  #   }
 
   # create final QC table
   qc <- extractMetrics(loci, put_cnvs, pennqc, rds_path)
@@ -87,5 +86,5 @@ qctree_pipeline <- function(loci, calls, pennqc, samples_list, rds_path, cnvrs =
     put_cnvs <- fsetdiff(put_cnvs, duprm)
   }
 
-  return(list(put_cnvs, cnvrs[[1]], qc, loci))
+  return(list(put_cnvs, qc, loci))
 }
