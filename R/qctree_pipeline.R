@@ -16,37 +16,6 @@
 
 
 qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T) {
-  # check column names for all main objects
-  if (!all(c("locus", "chr", "start", "end") %in% colnames(loci)))
-    stop("Some columns are missing from loci object")
-
-  if (!all(c() %in% colnames(calls)))
-    stop("Some columns are missing from CNV calls object")
-
-  if (!all(c() %in% colnames(pennqc)))
-    stop("Some columns are missing from PennCNV QC object")
-
-  if (!all(c() %in% colnames(samples_list)))
-    stop("Some columns are missing from samples list object")
-
-  if(!is.na(cnvrs)) {
-    if (!all(c() %in% colnames(cnvrs)))
-      stop("Some columns are missing from cnvrs object")
-    if (!all(c("CNVR_ID", "locus") %in% colnames(calls))) # other????
-      stop("cnvrs are passed but no CNVR_ID | locus column is found in the cnv object")
-  }
-
-  # error if samples are not unique in the QC file
-  if (length(pennqc$sample_ID) != length(unique(pennqc$sample_ID)) )
-    stop("At least one sample has more than one line in the QC file")
-
-  # warning if calls form samples not in the QC are present
-  if (!all(calls$sample_ID %in% pennqc$sample_ID))
-    warning("Some calls are from samples not present in the QC object")
-
-  # warning if calls not in the samplee list are present
-  if (!all(calls$sample_ID %in% samples_list$sample_ID))
-    warning("Some calls are from samples not present in the samples list object")
 
   # check and correct chr & GT/CN
   chr_uniform(loci)
@@ -87,4 +56,39 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T) {
   }
 
   return(list(put_cnvs, qc, loci))
+}
+
+
+check_inputs <- function(loci, calls, pennqc, samples_list) {
+  # check column names for all main objects
+  if (!all(c("locus", "chr", "start", "end") %in% colnames(loci)))
+    stop("Some required columns are missing from loci object")
+
+  if (!all(c("sample_ID", "chr", "start", "end", "CN", "numsnp") %in% colnames(calls)))
+    stop("Some required columns are missing from CNV calls object")
+
+  if (!all(c("sample_ID", "BAFdrift", "LRRSD", "GCWF") %in% colnames(pennqc)))
+    stop("Some required columns are missing from PennCNV QC object")
+
+  if (!all(c("sample_ID", "file_path", "file_path_tabix") %in% colnames(samples_list)))
+    stop("Some required columns are missing from samples list object")
+
+  if(!is.na(cnvrs)) {
+    if (!all(c() %in% colnames(cnvrs)))
+      stop("Some required columns are missing from cnvrs object")
+    if (!all(c("CNVR_ID", "locus") %in% colnames(calls))) # other????
+      stop("cnvrs are passed but no CNVR_ID | locus column is found in the cnv object")
+  }
+
+  # error if samples are not unique in the QC file
+  if (length(pennqc$sample_ID) != length(unique(pennqc$sample_ID)) )
+    stop("At least one sample has more than one line in the QC file")
+
+  # warning if calls form samples not in the QC are present
+  if (!all(calls$sample_ID %in% pennqc$sample_ID))
+    warning("Some calls are from samples not present in the QC object")
+
+  # error if calls not in the samplee list are present
+  if (!all(calls$sample_ID %in% samples_list$sample_ID))
+    stop("Some calls are from samples not present in the samples list object")
 }
