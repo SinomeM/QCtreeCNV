@@ -15,7 +15,8 @@
 # in that case the CNV calls must also be already the equivalent of put_cnvs
 
 
-qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T) {
+qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
+                       minsnp = 20, maxgap = 0.5, minoverlap = 0.2) {
 
   # check and correct chr & GT/CN
   chr_uniform(loci)
@@ -27,7 +28,7 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T) {
   calls[, length := end - start + 1]
 
   # select and stitch calls in the required loci
-  put_cnvs <- select_stitch_calls(calls, loci)
+  put_cnvs <- select_stitch_calls(calls, loci, minsnp, maxgap, minoverlap)
 
   #   # compute CNVRs (long step)
   #   if (is.na(cnvrs)) {
@@ -37,9 +38,6 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T) {
   #     cnvrs <- cnvrs_create(put_cnvs, arms)
   #     put_cnvs <- cnvrs[[2]]
   #   }
-
-  # create final QC table
-  qc <- extractMetrics(loci, put_cnvs, pennqc, rds_path)
 
   # if there is more than one call per locus in a sample, keep the largest one
   if (rm_dup) {
@@ -54,6 +52,9 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T) {
     }
     put_cnvs <- fsetdiff(put_cnvs, duprm)
   }
+
+  # create final QC table
+  qc <- extractMetrics(loci, put_cnvs, pennqc, rds_path)
 
   return(list(put_cnvs, qc, loci))
 }

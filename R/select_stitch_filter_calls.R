@@ -12,9 +12,9 @@
 
 select_stitch_calls <- function(cnvs, loci, minsnp = 20,
                                maxgap = 0.5, minoverlap = 0.2) {
-  
+
   if(!"length" %in% colnames(cnvs)) cnvs[, length := end - start + 1]
-  
+
   l <- 1
 
   for (i in 1:nrow(loci)) {
