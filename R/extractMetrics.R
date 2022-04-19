@@ -88,6 +88,15 @@ extractMetrics <- function(loci, cnvs, pennQC, samples_list, snppos = NA) {
   # sort columns
   dtOUT <- dtOUT[ , .(sample_ID, locus, putCarrier, LRRSD, BAFdrift, GCWF,
                       logr1, LRRSDlocus, BAFc, BAFb, centDistProp, mLRRlocus)]
-  return(dtOUT)
+
+  # add qs measures, i.e. merge the two tables
+  setkeyv(cnvs, c("sample_ID", "locus"))
+  setkeyv(dtOUT, c("sample_ID", "locus"))
+  # join tables using data.table keys
+  cnvsOUT <- dtOUT[cnvs]
+  # add excl column to keep track of the process
+  cnvsOUT[, excl := -1]
+
+  return(cnvsOUT)
 }
 

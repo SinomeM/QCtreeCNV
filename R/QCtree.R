@@ -52,7 +52,7 @@
 # - CNVRs
 # - step 1 (QC)
 # - step 4
-qctree <- function(cnvs, cnvrs, qsdt, loci,
+qctree <- function(cnvdt, cnvrs, loci,
                    maxLRRSD=.35, maxBAFdrift=.01,maxGCWF=.02, minGCWF=-.02,
                    commonCNVRsMinFreq = NA, st2minov = 0.65,
                    st4minlogr1=-.35,st4maxlogr1=.4, st4maxBAFcDEL=.03,
@@ -70,12 +70,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   message("# -------------------------- #\n",
           "Step 0, pre-process")
 
-  # add qs measures, i.e. merge the two tables
-  setkeyv(cnvs, c("sample_ID", "locus"))
-  setkeyv(qsdt, c("sample_ID", "locus"))
-  # join tables using data.table keys
-  cnvsOUT <- qsdt[cnvs]
-  # add excl column to keep track of the process
+  cnvsOUT <- cnvdt
   cnvsOUT[, excl := -1]
 
 
@@ -91,7 +86,7 @@ qctree <- function(cnvs, cnvrs, qsdt, loci,
   ### STEP 2 & 3 CNVRs ###
   message("# -------------------------- #\n",
           "Steps 2 and 3, CNVRs")
-  cnvrs_groups <- sortCNVRs(cnvs, loci, cnvrs, commonCNVRsMinFreq)
+  cnvrs_groups <- sortCNVRs(cnvsOUT, loci, cnvrs, commonCNVRsMinFreq)
 
   # STEP 2
   cnvsOUT <- step2(cnvsOUT, cnvrs_groups, st2minov)
