@@ -5,9 +5,8 @@
 \title{CNVs QC Filtering Tree}
 \usage{
 qctree(
-  cnvs,
+  cnvdt,
   cnvrs,
-  qsdt,
   loci,
   maxLRRSD = 0.35,
   maxBAFdrift = 0.01,
@@ -31,11 +30,7 @@ qctree(
 )
 }
 \arguments{
-\item{cnvs}{lorem ipsum}
-
 \item{cnvrs}{lorem ipsum}
-
-\item{qsdt}{lorem ipsum}
 
 \item{loci}{lorem ipsum}
 
@@ -72,6 +67,10 @@ qctree(
 \item{clean_out}{lorem ipsum}
 
 \item{st5exclLRRSD}{lorem ipsum}
+
+\item{cnvs}{lorem ipsum}
+
+\item{qsdt}{lorem ipsum}
 }
 \description{
 The main functions of the \code{QCtreeCNV} package

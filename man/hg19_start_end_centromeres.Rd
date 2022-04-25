@@ -3,14 +3,14 @@
 \docType{data}
 \name{hg19_start_end_centromeres}
 \alias{hg19_start_end_centromeres}
-\title{Start, end and centrosome position of all chromosomes in the assembly hg19}
+\title{Start, end and centromere position of all chromosomes in the assembly hg19}
 \format{
 A data frame with 53940 rows and 10 variables:
 \describe{
 \item{chr}{chromosome, 1:24}
 \item{start}{first base pair position, 0 indexed}
 \item{end}{last position}
-\item{centrosome}{centrosome position}
+\item{centromere}{centromere position}
 ...
 }
 }
@@ -18,6 +18,6 @@ A data frame with 53940 rows and 10 variables:
 hg19_start_end_centromeres
 }
 \description{
-Start, end and centrosome position of all chromosomes in the assembly hg19
+Start, end and centromere position of all chromosomes in the assembly hg19
 }
 \keyword{datasets}
