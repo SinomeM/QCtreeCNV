@@ -63,6 +63,9 @@ cnvr_fast <- function(put_cnvs) {
       en <- as.integer(median(cnvs[cnvr == i, end]))
       cnvrs <- rbind(cnvrs, data.table(cnvr = i, start = st, end = en))
     }
+
+    cnvs_all <- rbind(cnvs_all, cnvs)
+    cnvrs_all <- rbind(cnvrs_all, cnvrs)
   }
 
   return(list(cnvs = cnvs_all, cnvrs = cnvrs_all))
