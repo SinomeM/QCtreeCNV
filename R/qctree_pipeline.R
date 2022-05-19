@@ -19,10 +19,10 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
                        minsnp = 20, maxgap = 0.5, minoverlap = 0.2) {
 
   # fix cnvs sample_ID
-  setnames(calls, "sample_ID", "file_path")
+  setnames(calls, "sample_ID", "file_path", skip = T)
   calls <- merge(calls, samples_list[, .(sample_ID, file_path)])
 
-  setnames(calls, "stop", "end")
+  setnames(calls, "stop", "end", skip = T)
 
   calls <- calls[, .(sample_ID, chr, start, end, numsnp, type, conf)]
 
