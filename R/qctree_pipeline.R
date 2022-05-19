@@ -18,14 +18,22 @@
 qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
                        minsnp = 20, maxgap = 0.5, minoverlap = 0.2) {
 
+  # fix cnvs sample_ID
+  setnames(calls, "sample_ID", "file_path")
+  calls <- merge(calls, samples_list[, .(sample_ID, file_path)])
+
+  setnames(calls, "stop", "end")
+
+  calls <- calls[, .(sample_ID, chr, start, end, numsnp, type, conf)]
+
   # check and correct chr & GT/CN
   chr_uniform(loci)
   chr_uniform(calls)
   uniform_GT_CN(calls)
 
   # add length
-  loci[, length := end - start + 1]
-  calls[, length := end - start + 1]
+  loci[, `:=` (start = as.integer(start), end = as.integer(end))][, length := end - start + 1]
+  calls[, `:=` (start = as.integer(start), end = as.integer(end))][, length := end - start + 1]
 
   # select and stitch calls in the required loci
   put_cnvs <- select_stitch_calls(calls, loci, minsnp, maxgap, minoverlap)
@@ -54,7 +62,7 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
   }
 
   # create final QC table
-  qc <- extractMetrics(loci, put_cnvs, pennqc, rds_path)
+  qc <- extractMetrics(loci, put_cnvs, pennqc)
 
   return(list(put_cnvs, qc))
 }
