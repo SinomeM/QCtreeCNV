@@ -142,15 +142,18 @@ uniform_GT_CN <- function(DT_in) {
 # change it tot a list ????
 
 getline_cnv <- function(cnv) {
-  if (!"CNVR_ID" %in% colnames(cnv)) stop("CNVR_ID column is missing")
+  if (!"CNVR_ID" %in% colnames(cnv)) 
 
   st <- cnv$start
   en <- cnv$end
   if ("length" %in% colnames(cnv)) l <- cnv$length
   else l <- en - st + 1
   cen <- st + l/2
-  #           1              2          3       4       5            6   7   8  9
-  myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, cnv$CNVR_ID, st, en, l, cen)
+  if (!"CNVR_ID" %in% colnames(cnv))
+    #           1              2          3       4       5            6   7   8  9
+    myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, cnv$CNVR_ID, st, en, l, cen)
+  else
+    myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, NA         , st, en, l, cen)
   return(myline)
 }
 
