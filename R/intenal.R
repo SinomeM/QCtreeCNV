@@ -153,7 +153,7 @@ getline_cnv <- function(cnv) {
     #           1              2          3       4       5            6   7   8  9
     myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, cnv$CNVR_ID, st, en, l, cen)
   else
-    myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, NA         , st, en, l, cen)
+    myline <- c(cnv$sample_ID, cnv$locus, cnv$GT, cnv$CN, st, en, l, cen)
   return(myline)
 }
 
