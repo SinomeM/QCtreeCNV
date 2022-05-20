@@ -63,7 +63,7 @@ cnvr_fast <- function(put_cnvs) {
       # smooth the boundaries, median is less sensible to extreme values
       st <- as.integer(median(cnvs[cnvr == i, start]))
       en <- as.integer(median(cnvs[cnvr == i, end]))
-      cnvrs <- rbind(cnvrs, data.table(cnvr = i, chr = cnvs[1, chr] ,start = st, end = en))
+      cnvrs <- rbind(cnvrs, data.table(cnvr = i, chr = cnvs[1, chr] ,start = st, end = en, freq = nrow(cnvs[cnvr == i, ])))
     }
 
     cnvs[, cnvr := paste0(l, "_", cnvr)]
