@@ -106,3 +106,17 @@ check_inputs <- function(loci, calls, pennqc, samples_list) {
   if (!all(calls$sample_ID %in% samples_list$sample_ID))
     stop("Some calls are from samples not present in the samples list object")
 }
+
+
+#' Export putative CNV calls for Visual Inspection
+#'
+#' @export
+#'
+#' @import data.table
+
+export_cnvs <- function(cnvs, file_name) {
+
+  cnvs <- cnvs[, .(sample_ID, chr, start, end, GT, CN, locus)]
+  fwrite(cnvs, file_name, sep ="\t")
+
+}

@@ -2,8 +2,10 @@
 
 export(cnvr_fast)
 export(cnvrs_create)
+export(export_cnvs)
 export(extractMetrics)
 export(extractRDS)
+export(qc_plots_cnvs)
 export(qctree)
 export(qctree_pre)
 export(saveCNVplots)

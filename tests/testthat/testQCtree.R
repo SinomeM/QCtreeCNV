@@ -44,7 +44,7 @@ dtc <- data.table(locus = c(rep.int("a", 10), rep.int("b", 15),
 # simplified case where each CNVR is in a separate chromosome
 dtl <- data.table(locus = c("a", "b", "c", "d"), chr = c(1, 2, 3, 4),
                   start = c(1, 10, 100, 1000), end = c(1001, 2010, 3100, 5000))
-dtr <- data.table(CNVR_ID = c("a1", "b1", "b2", "c1", "c2", "d1", "d2", "d3", "d4"),
+dtr <- data.table(cnvr = c("a1", "b1", "b2", "c1", "c2", "d1", "d2", "d3", "d4"),
                   chr= c("..."))
 
 test_that("CNVRs sorting behave as expected", {
@@ -58,7 +58,7 @@ test_that("CNVRs sorting behave as expected", {
 # - cnvs with st1 = 1 will have st2 = -1 and excl = -1
 rr <- list(c("a", "b"), "c", "d")
 dt <- data.table(st1 = c(0, 0, 0, rep.int(1,7)),
-                 CNVR_ID = c(rr[[1]], rep_len(c(rr[[2]],rr[[3]]), 7),
+                 cnvr = c(rr[[1]], rep_len(c(rr[[2]],rr[[3]]), 7),
                              rr[[1]][1]),
                  excl = -1)
 dt <- QCtreeCNV:::step2(dt, rr)
@@ -89,7 +89,7 @@ test_that("Step 2 behave as expected", {
 
 rr <- list("a", c("b", "c"), "d")
 dt <- data.table(st2 = c(0, 0, 0, rep.int(1,7)),
-                 CNVR_ID = c(rr[[2]], rr[[3]],
+                 cnvr = c(rr[[2]], rr[[3]],
                              rep_len(rr[[1]], 6), rr[[3]]),
                  excl = -1)
 dt <- QCtreeCNV:::step3(dt, rr)
