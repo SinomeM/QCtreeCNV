@@ -71,12 +71,12 @@ extractMetrics <- function(loci, cnvs, pennQC, samples_list, snppos = NA) {
                                        " locus ", loc[1]))
         # info on putative call, if present
         putline <- getline_cnv(put)
-        tmp1 <- tmp[between(position, as.integer(putline[6]), as.integer(putline[7])),]
-        ov <- min(as.integer(loc[4]), as.integer(putline[7])) - max(as.integer(loc[3]), as.integer(putline[6])) +1
+        tmp1 <- tmp[between(position, as.integer(putline[5]), as.integer(putline[6])),]
+        ov <- min(as.integer(loc[4]), as.integer(putline[6])) - max(as.integer(loc[3]), as.integer(putline[5])) +1
         if (ov < 0) stop("Something is wrong, overlap can't be negative)")
         dt[sample_ID == s, `:=` (putCarrier =T,
                                  mLRRcall = mean(tmp1[, LRR], na.rm=T),
-                                 centDistProp = abs(as.integer(loc[6]) - as.integer(putline[9])) / as.integer(loc[5]))]
+                                 centDistProp = abs(as.integer(loc[6]) - as.integer(putline[8])) / as.integer(loc[5]))]
       }
 
       dt[,logr1 := log(abs(mLRRcall / mLRRlocus))]
