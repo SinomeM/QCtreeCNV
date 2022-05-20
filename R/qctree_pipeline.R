@@ -22,6 +22,10 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
   setnames(calls, "sample_ID", "file_path", skip = T)
   calls <- merge(calls, samples_list[, .(sample_ID, file_path)])
 
+  # fix qc sample_ID
+  setnames(pennqc, "sample_ID", "file_path", skip = T)
+  calls <- merge(pennqc, samples_list[, .(sample_ID, file_path)])
+
   setnames(calls, "stop", "end", skip = T)
 
   calls <- calls[, .(sample_ID, chr, start, end, numsnp, type, conf)]
