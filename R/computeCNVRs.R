@@ -36,18 +36,24 @@ cnvr_fast <- function(put_cnvs) {
     if (sum(is.na(tmp)) > 0)
       tmp <- data.frame(X = cnvs$center, Y = cnvs$length)
 
-    maxk <- nrow(tmp)-1
-    rr <- seq(2, 54, by = 4)
-    r1 <- rr[1:7]
+    if (nrow(tmp) > 2) {
+      maxk <- nrow(tmp)-1
+      rr <- seq(2, 54, by = 4)
+      r1 <- rr[1:7]
 
-    # it's hard to imagine more than 24 CNVRs per window
-    pam_cl <- fpc::pamk(tmp, krange = r1[r1 < maxk])
-    nc <- pam_cl$nc
-    # just in case
-    if (nc == 24) pam_cl <- fpc::pamk(tmp, krange = rr[8:14])
-    # fine tune the actual number of clusters
-    pam_cl <- fpc::pamk(tmp, krange = nc-3:nc+3)
-    cl <- as.integer(pam_cl$pamobject$clustering)
+      # it's hard to imagine more than 24 CNVRs per window
+      pam_cl <- fpc::pamk(tmp, krange = r1[r1 < maxk])
+      nc <- pam_cl$nc
+      # just in case
+      if (nc == 24) pam_cl <- fpc::pamk(tmp, krange = rr[8:14])
+      # fine tune the actual number of clusters
+      pam_cl <- fpc::pamk(tmp, krange = nc-3:nc+3)
+      cl <- as.integer(pam_cl$pamobject$clustering)
+    }
+    else {
+      pam_cl <- fpc::pamk(tmp, krange = 1:2)
+      cl <- as.integer(pam_cl$pamobject$clustering)
+    }
 
     # assign each CNV to his cluster
     cnvs[, cnvr := cl]
