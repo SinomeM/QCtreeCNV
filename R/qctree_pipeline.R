@@ -26,7 +26,7 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
   setnames(pennqc, "sample_ID", "file_path", skip = T)
   pennqc <- merge(pennqc, samples_list[, .(sample_ID, file_path)])
 
-  setnames(pennqc, "LRR_SD", "LLRSD")
+  setnames(pennqc, c("LRR_SD", "WF", "BAF_DRIFT"), c("LLRSD", "GCWF", "BAFdrift"))
   setnames(calls, "stop", "end", skip = T)
 
   calls <- calls[, .(sample_ID, chr, start, end, numsnp, type, conf)]
@@ -68,9 +68,8 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
   }
 
   # create final QC table
-  # qc <- extractMetrics(loci, put_cnvs, pennqc, samples_list)
-  # return(qc))
-  return(put_cnvs)
+  qc <- extractMetrics(loci, put_cnvs, pennqc, samples_list)
+  return(qc)
 }
 
 
