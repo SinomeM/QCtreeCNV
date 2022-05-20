@@ -51,8 +51,7 @@ cnvr_fast <- function(put_cnvs) {
       cl <- as.integer(pam_cl$pamobject$clustering)
     }
     else {
-      pam_cl <- fpc::pamk(tmp, krange = 1:2)
-      cl <- as.integer(pam_cl$pamobject$clustering)
+      cl <- rep(1, nrow(tmp))
     }
 
     # assign each CNV to his cluster
