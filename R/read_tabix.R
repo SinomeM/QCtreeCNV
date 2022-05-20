@@ -12,6 +12,6 @@ get_region_tabix <- function(chr, start, end, f_path, snppos = NA) {
   # filter SNPs if required
   if (!is.na(snppos)) a <- a[snp_name %in% snp_pos$snp_name, ]
 
-  setorder(a, start)
+  setorder(a, position)
   return(a)
 }
