@@ -43,11 +43,11 @@ extractMetrics <- function(loci, cnvs, pennQC, samples_list, snppos = NA) {
       if (is.na(snppos)) tmp <- get_region_tabix(loc[2], loc[3], loc[4], f_path)
       else tmp <- get_region_tabix(loc[2], loc[3], loc[4], f_path, snppos)
 
-      bafc <- nrow(tmp[between(`B Allele Freq`, 0.4, 0.6, incbounds=T), ]) /
+      bafc <- nrow(tmp[between(BAF, 0.4, 0.6, incbounds=T), ]) /
                 nrow(tmp)
-      bafb <- nrow(tmp[between(`B Allele Freq`, 0.2, 0.4, incbounds=F) |
-                       between(`B Allele Freq`, 0.6, 0.8, incbounds=F) |
-                       `B Allele Freq` %in% c(0.2, 0.8), ]) / nrow(tmp)
+      bafb <- nrow(tmp[between(BAF, 0.2, 0.4, incbounds=F) |
+                       between(BAF, 0.6, 0.8, incbounds=F) |
+                       BAF %in% c(0.2, 0.8), ]) / nrow(tmp)
 
       # sample QC measure from PennCNV
       qcline <- pennQC[sample_ID == s, ][1] # temporary fix!!!!
@@ -56,8 +56,8 @@ extractMetrics <- function(loci, cnvs, pennQC, samples_list, snppos = NA) {
                                GCWF = qcline$GCWF)]
 
       # locus measures (compute them regardless of the presence of a call)
-      dt[sample_ID == s, `:=` (mLRRlocus = mean(tmp[, `Log R Ratio`], na.rm=T),
-                         LRRSDlocus = sd(tmp[, `Log R Ratio`], na.rm=T),
+      dt[sample_ID == s, `:=` (mLRRlocus = mean(tmp[, LRR], na.rm=T),
+                         LRRSDlocus = sd(tmp[, LRR], na.rm=T),
                          BAFc = bafc, BAFb = bafb)]
 
       # check if this sample has a call in the locus
@@ -71,11 +71,11 @@ extractMetrics <- function(loci, cnvs, pennQC, samples_list, snppos = NA) {
                                        " locus ", loc[1]))
         # info on putative call, if present
         putline <- getline_cnv(put)
-        tmp1 <- tmp[between(Position, as.integer(putline[6]), as.integer(putline[7])),]
+        tmp1 <- tmp[between(position, as.integer(putline[6]), as.integer(putline[7])),]
         ov <- min(as.integer(loc[4]), as.integer(putline[7])) - max(as.integer(loc[3]), as.integer(putline[6])) +1
         if (ov < 0) stop("Something is wrong, overlap can't be negative)")
         dt[sample_ID == s, `:=` (putCarrier =T,
-                                 mLRRcall = mean(tmp1[, `Log R Ratio`], na.rm=T),
+                                 mLRRcall = mean(tmp1[, LRR], na.rm=T),
                                  centDistProp = abs(as.integer(loc[6]) - as.integer(putline[9])) / as.integer(loc[5]))]
       }
 
