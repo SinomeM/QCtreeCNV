@@ -53,6 +53,7 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
     for (l in unique(put_cnvs[, locus])) {
       a <- put_cnvs[locus == l, ]
       b <- a[sample_ID %in% a$sample_ID[duplicated(a$sample_ID)], ]
+      if (nrow(b) == 0) next
       for (s in unique(b$sample_ID)) {
         lk <- max(b[sample_ID == s, length])
         duprm <- rbind(duprm, b[sample_ID == s & length != lk, ])
@@ -63,8 +64,7 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
 
   # create final QC table
   # qc <- extractMetrics(loci, put_cnvs, pennqc, samples_list)
-
-  # return(list(put_cnvs, qc))
+  # return(qc))
   return(put_cnvs)
 }
 
