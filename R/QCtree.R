@@ -142,7 +142,7 @@ step1 <- function(cnvs, mlrrsd, mbafd, mingc, maxgc) {
 step2 <- function(cnvs, cnvrs, minov) {
   cnvs[, st2 := -1]
   # CNVs from step 1 == 0 that are in a cnvrA and large enough will pass step 2 (to good CNVs)
-  cnvs[st1 == 0 & CNVR_ID %in% cnvrs[[1]] & overlap > minov, `:=` (st2 = 1, excl = 0)]
+  cnvs[st1 == 0 & cnvr %in% cnvrs[[1]] & overlap > minov, `:=` (st2 = 1, excl = 0)]
   # CNVs from step 1 == 0 that are not in a cnvrA will fail step 2 (to step3)
   cnvs[st1 == 0 & st2 == -1, st2 := 0]
 
@@ -157,8 +157,8 @@ step3 <- function(cnvs, cnvrs) {
   cnvs[, st3 := -1]
   # CNVs from step 2 == 0 that are in a cnvrB will go to step 4
   # CNVs from step 2 == 0 that are in a cnvrC will go to step 5
-  cnvs[st2 == 0 & CNVR_ID %in% cnvrs[[2]], st3 := 1]
-  cnvs[st2 == 0 & CNVR_ID %in% cnvrs[[3]], st3 := 0]
+  cnvs[st2 == 0 & cnvr %in% cnvrs[[2]], st3 := 1]
+  cnvs[st2 == 0 & cnvr %in% cnvrs[[3]], st3 := 0]
   # The one in cnvrA but not large enough will go to step 5
   cnvs[st2 == 0 & st3 == -1, st3 := 0]
 
@@ -278,10 +278,10 @@ sortCNVRs <- function(cnvs, loci, cnvrs, minFreq) {
                     pmax(start,as.integer(loc_line[3])) + 1) /
                       as.integer(loc_line[5])]
 
-    cnvrsA <- c(cnvrsA, lcnvrs[op >= 0.75, CNVR_ID])
+    cnvrsA <- c(cnvrsA, lcnvrs[op >= 0.75, cnvr])
     # the user should be able to change these values
-    cnvrsB <- c(cnvrsB, lcnvrs[freq >= th5 & op <= 0.55, CNVR_ID])
-    cnvrsC <- c(cnvrsC, lcnvrs[!CNVR_ID %in% c(cnvrsA, cnvrsB), CNVR_ID])
+    cnvrsB <- c(cnvrsB, lcnvrs[freq >= th5 & op <= 0.55, cnvr])
+    cnvrsC <- c(cnvrsC, lcnvrs[!cnvr %in% c(cnvrsA, cnvrsB), cnvr])
   }
   return(list(cnvrsA, cnvrsB, cnvrsC))
 }
