@@ -59,7 +59,7 @@ qctree_pre <- function(loci, calls, pennqc, samples_list, rm_dup = T,
         duprm <- rbind(duprm, b[sample_ID == s & length != lk, ])
       }
     }
-    put_cnvs <- fsetdiff(put_cnvs, duprm)
+    if (nrow(duprm) >= 1) put_cnvs <- fsetdiff(put_cnvs, duprm)
   }
 
   # create final QC table
