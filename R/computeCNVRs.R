@@ -66,6 +66,9 @@ cnvr_fast <- function(put_cnvs) {
       cnvrs <- rbind(cnvrs, data.table(cnvr = i, start = st, end = en))
     }
 
+    cnvs[, cnvr := paste0(l, "_", cnvr)]
+    cnvrs[, cnvr := paste0(l, "_", cnvr)]
+
     cnvs_all <- rbind(cnvs_all, cnvs)
     cnvrs_all <- rbind(cnvrs_all, cnvrs)
   }
