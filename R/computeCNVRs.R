@@ -36,7 +36,7 @@ cnvr_fast <- function(put_cnvs) {
     if (sum(is.na(tmp)) > 0)
       tmp <- data.frame(X = cnvs$center, Y = cnvs$length)
 
-    if (nrow(tmp) > 2) {
+    if (nrow(tmp) > 3) {
       maxk <- nrow(tmp)-1
       rr <- c(1, seq(2, 54, by = 4))
       r1 <- rr[1:8]
