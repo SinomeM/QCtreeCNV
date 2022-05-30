@@ -70,7 +70,7 @@ qctree <- function(cnvdt, cnvrs, loci,
   message("# -------------------------- #\n",
           "Step 0, pre-process")
 
-  cnvsOUT <- cnvdt
+  cnvsOUT <- copy(cnvdt)
   cnvsOUT[, excl := -1]
 
 
