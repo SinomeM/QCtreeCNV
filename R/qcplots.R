@@ -29,7 +29,11 @@
 
 
 qc_plots_cnvs <- function(cnvs, folder_name, qc,
+                          min_numsnp = 20, min_overlap = 0.2,
                           maxLRRSD=.35, maxBAFdrift=.01, maxGCWF=.02, minGCWF=-.02) {
+
+  # keep only validated CNVs
+  cnvs <- cnvs[visual_output == 1, ]
 
   # apply the same filter to compute the prevalences
   qc <- qc[LRRSD <= maxLRRSD & BAFdrift <= maxBAFdrift &
@@ -51,22 +55,50 @@ qc_plots_cnvs <- function(cnvs, folder_name, qc,
   b <- qc[sample_ID %in% cnvs[visual_output == 1, sample_ID], .N, by = .(lrrsd_group, GT)]; setnames(a, "N", "x")
 
   dtlrr <- merge(dtlrr, merge(a,b))
-  dtlrr[, prevalence := (x/n)*100]
-  ## BETA distribution to compute the Confidence Intervals? ##
-  ##
-  pl1 <- ggplot(aes(y = prevalence, x = LRRSD_group, colour = GT), data = dtlrr) +
-           geom_point(position = "dodge") +
-           geom_errorbar(aes(ymin = CImin, ymax = CImax, colour = GT)) + theme_bw()
+  dtlrr[, prevalence := round((x/n)*100, digits=3)]
+  # BETA distribution to compute the Confidence Intervals
+  # computed applying  the Bayesian credible interval using the Jeffreys prior
+  # as in ‘Brown, Lawrence D., T. Tony Cai, and Anirban DasGupta. “Interval Estimation
+  # for a Binomial Proportion.” Statistical Science 16, no. 2 (2001): 101–17.
+  # http://www.jstor.org/stable/2676784.’
+  dtlrr[, CImin := round(100*qbeta(c(0.05/2,1-0.05/2), x+0.05, n-x+0.05)[1], digits = 3)][,
+          CImax := round(100*qbeta(c(0.05/2,1-0.05/2), x+0.05, n-x+0.05)[2], digits = 3)]
+
+  pl1 <- ggplot(aes(y = prevalence, x = LRRSD_group, colour = as.character(GT)), data = dt1) +
+           geom_point(position = position_dodge(0.3), size = 3) +
+           geom_errorbar(aes(ymin = CImin, ymax = CImax, colour = as.character(GT)),
+                         position = position_dodge(0.3), size = 0.5, width = 0.3) +
+           scale_colour_discrete(name = "Type", labels = c("Del", "Dup")) + theme_bw()heme_bw()
 
   # plot 2&3, numsnp and overlap density
-  pl2 <- ggplot(aes(x = numsnp, colour = GT, linetype = visual_output), data = dt) +
-           geom_density() + theme_bw()
+  pl2 <- ggplot(aes(x = numsnp, colour = as.character(GT)), data = cnvs) +
+             geom_density() +
+             scale_colour_discrete(name = "Type", labels = c("Del", "Dup")) +
+             geom_vline(xintercept = min_numsnp, linetype="dashed") +
+             theme_bw()
 
-  pl3 <- ggplot(aes(x = overlap, colour = GT, linetype = visual_output), data = dt) +
-           geom_density() + theme_bw()
+  pl3 <- ggplot(aes(x = overlap, colour = as.character(GT)), data = cnvs) +
+             geom_density() +
+             scale_colour_discrete(name = "Type", labels = c("Del", "Dup")) +
+             geom_vline(xintercept = min_overlap, linetype="dashed") +
+             theme_bw()
+
 
   # similar to pl1 but for BAFdrift and GCWF
   pl4 <- ggplot()
   pl5 <- ggplot()
 
+  # save plots in PDF
+  dir.create(folder_name)
+  pdf(system.file(folder_name, "plot1.pdf"))
+  print(pl1)
+  pdf(system.file(folder_name, "plot1.pdf"))
+  print(pl2)
+  pdf(system.file(folder_name, "plot1.pdf"))
+  print(pl3)
+  pdf(system.file(folder_name, "plot1.pdf"))
+  print(pl4)
+  pdf(system.file(folder_name, "plot1.pdf"))
+  print(pl5)
+  dev.off()
 }
