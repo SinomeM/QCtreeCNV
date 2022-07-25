@@ -68,7 +68,7 @@ qc_plots_cnvs <- function(cnvs, folder_name, qc,
            geom_point(position = position_dodge(0.3), size = 3) +
            geom_errorbar(aes(ymin = CImin, ymax = CImax, colour = as.character(GT)),
                          position = position_dodge(0.3), size = 0.5, width = 0.3) +
-           scale_colour_discrete(name = "Type", labels = c("Del", "Dup")) + theme_bw()heme_bw()
+           scale_colour_discrete(name = "Type", labels = c("Del", "Dup")) + theme_bw()
 
   # plot 2&3, numsnp and overlap density
   pl2 <- ggplot(aes(x = numsnp, colour = as.character(GT)), data = cnvs) +
