@@ -3,7 +3,7 @@
 #' @import data.table
 
 get_region_tabix <- function(chr, start, end, f_path, snppos = NA) {
-  a <- fread(cmd = paste("tabix", f_path, chr, ":", start, "-", end, sep = " "), header = F)
+  a <- fread(cmd = paste0("tabix ", f_path, " ", chr, ":", start, "-", end), header = F)
   colnames(a) <- c("chr", "position", "end", "LRR", "BAF", "LRRadj")
 
   # Turn NaN into standard NAs
