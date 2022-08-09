@@ -17,7 +17,7 @@ saveCNVplots <- function(cnvs, plots_path, loci, samples_file, reg_len = 2000000
 
   for (i in 1:nrow(cnvs)) {
 
-    if (overwrite)
+    if (!overwrite)
       if (file.exists(pl_path)) next
 
     s <- cnvs[i, sample_ID]
