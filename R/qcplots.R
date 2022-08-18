@@ -48,11 +48,12 @@ qc_plots_cnvs <- function(cnvs, folder_name, qc,
       abs(GCWF) <= 0.005, gcwf_group := "low"][abs(GCWF) >= 0.01, gcwf_group := "high"]
 
   # plot1, LRRSD chunks.
-  dtlrr <- data.table(LRRSD_group = rep(c("low", "medium", "high"), 2), GT = rep(c(1,2),3),
+  dtlrr <- data.table(lrrsd_group = rep(c("low", "medium", "high"), 2), GT = rep(c(1,2),3),
                    prevalence = NA, CImin = NA, CImax = NA)
 
   a <- qc[, .N, by = .(lrrsd_group, GT)]; setnames(a, "N", "n")
-  b <- qc[sample_ID %in% cnvs[visual_output == 1, sample_ID], .N, by = .(lrrsd_group, GT)]; setnames(a, "N", "x")
+  b <- qc[sample_ID %in% cnvs[visual_output == 1, sample_ID], .N, by = .(lrrsd_group, GT)]
+  setnames(a, "N", "x")
 
   dtlrr <- merge(dtlrr, merge(a,b))
   dtlrr[, prevalence := round((x/n)*100, digits=3)]
@@ -64,7 +65,7 @@ qc_plots_cnvs <- function(cnvs, folder_name, qc,
   dtlrr[, CImin := round(100*qbeta(c(0.05/2,1-0.05/2), x+0.05, n-x+0.05)[1], digits = 3)][,
           CImax := round(100*qbeta(c(0.05/2,1-0.05/2), x+0.05, n-x+0.05)[2], digits = 3)]
 
-  pl1 <- ggplot(aes(y = prevalence, x = LRRSD_group, colour = as.character(GT)), data = dt1) +
+  pl1 <- ggplot(aes(y = prevalence, x = lrrsd_group, colour = as.character(GT)), data = dtlrr) +
            geom_point(position = position_dodge(0.3), size = 3) +
            geom_errorbar(aes(ymin = CImin, ymax = CImax, colour = as.character(GT)),
                          position = position_dodge(0.3), size = 0.5, width = 0.3) +
@@ -85,20 +86,49 @@ qc_plots_cnvs <- function(cnvs, folder_name, qc,
 
 
   # similar to pl1 but for BAFdrift and GCWF
-  pl4 <- ggplot()
-  pl5 <- ggplot()
+  dtbaf <- data.table(bafd_group = rep(c("low", "medium", "high"), 2), GT = rep(c(1,2),3),
+                   prevalence = NA, CImin = NA, CImax = NA)
+  a <- qc[, .N, by = .(bafd_group, GT)]; setnames(a, "N", "n")
+  b <- qc[sample_ID %in% cnvs[visual_output == 1, sample_ID], .N, by = .(bafd_group, GT)]
+  setnames(a, "N", "x")
+  dtbaf <- merge(dtlrr, merge(a,b))
+  dtbaf[, prevalence := round((x/n)*100, digits=3)]
+  dtbaf[, CImin := round(100*qbeta(c(0.05/2,1-0.05/2), x+0.05, n-x+0.05)[1], digits = 3)][,
+          CImax := round(100*qbeta(c(0.05/2,1-0.05/2), x+0.05, n-x+0.05)[2], digits = 3)]
+
+  pl4 <- ggplot(aes(y = prevalence, x = bafd_group, colour = as.character(GT)), data = dtbaf) +
+           geom_point(position = position_dodge(0.3), size = 3) +
+           geom_errorbar(aes(ymin = CImin, ymax = CImax, colour = as.character(GT)),
+                         position = position_dodge(0.3), size = 0.5, width = 0.3) +
+           scale_colour_discrete(name = "Type", labels = c("Del", "Dup")) + theme_bw()
+
+  dtgc <- data.table(gcwf_group = rep(c("low", "medium", "high"), 2), GT = rep(c(1,2),3),
+                   prevalence = NA, CImin = NA, CImax = NA)
+  a <- qc[, .N, by = .(gcwf_group, GT)]; setnames(a, "N", "n")
+  b <- qc[sample_ID %in% cnvs[visual_output == 1, sample_ID], .N, by = .(gcwf_group, GT)]
+  setnames(a, "N", "x")
+  dtgc <- merge(dtlrr, merge(a,b))
+  dtgc[, prevalence := round((x/n)*100, digits=3)]
+  dtgc[, CImin := round(100*qbeta(c(0.05/2,1-0.05/2), x+0.05, n-x+0.05)[1], digits = 3)][,
+         CImax := round(100*qbeta(c(0.05/2,1-0.05/2), x+0.05, n-x+0.05)[2], digits = 3)]
+
+  pl5 <- ggplot(aes(y = prevalence, x = gcwf_group, colour = as.character(GT)), data = dtgc) +
+           geom_point(position = position_dodge(0.3), size = 3) +
+           geom_errorbar(aes(ymin = CImin, ymax = CImax, colour = as.character(GT)),
+                         position = position_dodge(0.3), size = 0.5, width = 0.3) +
+           scale_colour_discrete(name = "Type", labels = c("Del", "Dup")) + theme_bw()
 
   # save plots in PDF
   dir.create(folder_name)
   pdf(system.file(folder_name, "plot1.pdf"))
   print(pl1)
-  pdf(system.file(folder_name, "plot1.pdf"))
+  pdf(system.file(folder_name, "plot2.pdf"))
   print(pl2)
-  pdf(system.file(folder_name, "plot1.pdf"))
+  pdf(system.file(folder_name, "plot3.pdf"))
   print(pl3)
-  pdf(system.file(folder_name, "plot1.pdf"))
+  pdf(system.file(folder_name, "plot4.pdf"))
   print(pl4)
-  pdf(system.file(folder_name, "plot1.pdf"))
+  pdf(system.file(folder_name, "plot5.pdf"))
   print(pl5)
   dev.off()
 }
