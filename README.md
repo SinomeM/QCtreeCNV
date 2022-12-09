@@ -4,12 +4,10 @@
 
 ## Introduction
 
-This is the development repository for the QC filter I am working
-on in the context of reducing the human effort in CNV calling. Here
-the focus is on calling recurrent CNVs in fixed loci in particular.
+This R package implement a powerful CNV filtering pipeline as exemplified in the following figure.
+It is part of a protocol with a companion repository, <https://github.com/SinomeM/IBPcnv>.
 
-The aim is to integrate a much more powerful filter in the pipeline,
-before visual inspection, as exemplified in this figure.
+If you use thih software please cite <https://doi.org/10.1002/cpz1.621>
 
 ![CNVpipeline](./vignettes/CNVpipeline.png)
 
