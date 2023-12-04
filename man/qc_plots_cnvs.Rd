@@ -8,6 +8,8 @@ qc_plots_cnvs(
   cnvs,
   folder_name,
   qc,
+  min_numsnp = 20,
+  min_overlap = 0.2,
   maxLRRSD = 0.35,
   maxBAFdrift = 0.01,
   maxGCWF = 0.02,
