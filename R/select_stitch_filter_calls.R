@@ -43,9 +43,9 @@ select_stitch_calls <- function(cnvs, loci, minsnp = 20,
         ggap <- (lcnvs[k, start] - lcnvs[j, end]) / (lcnvs[k, end] - lcnvs[j, start])
 
         if (ggap < maxgap) {
-          lcnvs[k, `:=` (stitch = 1, gap = ggap, start = lcnvs[j, start],
-                        length = end - start + 1, numsnp = numsnp + lcnvs[j, numsnp],
-                        densnp = round(length / numsnp, digits = 0))]
+          lcnvs[k, `:=` (stitch = 1, gap = ggap, start = lcnvs[j, start])]
+          lcnvs[k, `:=` (length = end - start + 1, numsnp = numsnp + lcnvs[j, numsnp])]
+          lcnvs[k, densnp := round(length / numsnp, digits = 0)]
           lcnvs[j, remove := T]
           }
         }
